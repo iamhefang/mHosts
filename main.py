@@ -2,8 +2,7 @@
 
 import wx
 
-from widgets.AboutDialog import AboutDialog
-from widgets.MainWindow import MainWindow
+from widgets import MainWindow, AboutDialog
 
 
 class Application(wx.App):
@@ -16,12 +15,15 @@ class Application(wx.App):
         self.window.Show()
         self.Bind(wx.EVT_MENU, self.OnMenuClicked, id=self.window.menuItemExit.GetId())
         self.Bind(wx.EVT_MENU, self.OnMenuClicked, id=self.window.menuItemAbout.GetId())
+        self.window.Bind(wx.EVT_CLOSE, self.OnWindowClose, id=self.window.GetId())
+
+    def OnWindowClose(self, event):
+        self.window.Show(False)
 
     def ShowAboutDialog(self):
         self.aboutDialog.Show(True)
 
     def OnMenuClicked(self, event):
-        print(event.GetId())
         if event.GetId() == self.window.menuItemExit.GetId():
             exit(0)
         elif event.GetId() == self.window.menuItemAbout.GetId():

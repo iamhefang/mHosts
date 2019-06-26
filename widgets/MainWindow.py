@@ -47,12 +47,15 @@ class MainWindow(wx.Frame):
         self.statusBar = self.CreateStatusBar(1, wx.STB_SIZEGRIP, wx.ID_ANY)
         bSizer1 = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.hostsTree = wx.TreeCtrl(self, wx.ID_ANY, wx.Point(0, 0), wx.DefaultSize, wx.TR_DEFAULT_STYLE)
-        bSizer1.Add(self.hostsTree, 0, wx.ALL, 5)
+        self.hostsTree = wx.TreeCtrl(self, wx.ID_ANY, wx.Point(0, 0), wx.Size(200, -1), wx.TR_DEFAULT_STYLE)
+        bSizer1.Add(self.hostsTree, 0, wx.EXPAND, 5)
 
         self.codeEditor = wx.richtext.RichTextCtrl(self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize,
                                                    0 | wx.VSCROLL | wx.HSCROLL | wx.WANTS_CHARS | wx.BORDER_NONE)
-        bSizer1.Add(self.codeEditor, 1, wx.EXPAND | wx.ALL, 5)
+        self.codeEditor.SetFont(
+            wx.Font(11, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, False, "Consolas"))
+
+        bSizer1.Add(self.codeEditor, 1, wx.EXPAND, 5)
 
         self.SetSizer(bSizer1)
         self.Layout()
@@ -60,11 +63,15 @@ class MainWindow(wx.Frame):
         self.Centre(wx.BOTH)
 
         # Connect Events
-        self.Bind(wx.EVT_MENU, self.onMenuItemExitClicked, id=self.menuItemExit.GetId())
+        self.Bind(wx.EVT_MENU, self.OnExitMenuSelection, id=self.menuItemExit.GetId())
+        self.Bind(wx.EVT_MENU, self.OnAboutMenuSelection, id=self.menuItemAbout.GetId())
 
     def __del__(self):
         pass
 
     # Virtual event handlers, overide them in your derived class
-    def onMenuItemExitClicked(self, event):
+    def OnExitMenuSelection(self, event):
+        event.Skip()
+
+    def OnAboutMenuSelection(self, event):
         event.Skip()

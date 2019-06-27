@@ -80,7 +80,8 @@ class AboutDialog(wx.Dialog):
 
         bSizer2 = wx.BoxSizer(wx.VERTICAL)
 
-        self.m_staticText1 = wx.StaticText(self, wx.ID_ANY, u"MyLabel", wx.DefaultPosition, wx.DefaultSize, 0)
+        self.m_staticText1 = wx.StaticText(self, wx.ID_ANY, u"mHosts v0.0.1\n好用的hosts管理切换工具", wx.DefaultPosition,
+                                           wx.DefaultSize, 0)
         self.m_staticText1.Wrap(-1)
 
         bSizer2.Add(self.m_staticText1, 0, wx.ALL, 5)

@@ -1,21 +1,23 @@
 # _*_ coding: utf-8 _*_
 
-import wx
+from wx import App, BITMAP_TYPE_ICO, Icon, EVT_MENU, EVT_CLOSE, adv
 
 from widgets import MainWindow, AboutDialog
 
 
-class Application(wx.App):
+class Application(App):
     def __init__(self):
-        wx.App.__init__(self)
+        App.__init__(self)
         self.window = MainWindow(None)
         self.aboutDialog = AboutDialog(self.window)
-        # trayIcon = wx.EmptyIcon()
-        # trayIcon.LoadFile("")
+        self.window.SetIcon(Icon("icons/logo.ico", BITMAP_TYPE_ICO))
+
+        adv.TaskBarIcon().SetIcon(Icon("icons/logo.ico", BITMAP_TYPE_ICO))
+
         self.window.Show()
-        self.Bind(wx.EVT_MENU, self.OnMenuClicked, id=self.window.menuItemExit.GetId())
-        self.Bind(wx.EVT_MENU, self.OnMenuClicked, id=self.window.menuItemAbout.GetId())
-        self.window.Bind(wx.EVT_CLOSE, self.OnWindowClose, id=self.window.GetId())
+        self.Bind(EVT_MENU, self.OnMenuClicked, id=self.window.menuItemExit.GetId())
+        self.Bind(EVT_MENU, self.OnMenuClicked, id=self.window.menuItemAbout.GetId())
+        self.window.Bind(EVT_CLOSE, self.OnWindowClose, id=self.window.GetId())
 
     def OnWindowClose(self, event):
         self.window.Show(False)
@@ -30,5 +32,6 @@ class Application(wx.App):
             self.ShowAboutDialog()
 
 
-app = Application()
-app.MainLoop()
+if __name__ == '__main__':
+    app = Application()
+    app.MainLoop()

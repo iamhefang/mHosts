@@ -5,3 +5,4 @@ test/
 temp/
 /venv/
 *.iml
+__pycache__/

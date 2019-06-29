@@ -2,7 +2,7 @@ import sys
 import traceback
 
 from wx import App, Icon, BITMAP_TYPE_ICO, MessageBox, ICON_ERROR, OK, ICON_NONE, stc, \
-    SystemSettings, SYS_COLOUR_HIGHLIGHTTEXT, SYS_COLOUR_HIGHLIGHT, Colour
+    SystemSettings, SYS_COLOUR_HIGHLIGHTTEXT, SYS_COLOUR_HIGHLIGHT, Colour, EVT_CLOSE
 from wx.stc import STC_MARGIN_SYMBOL, STC_MASK_FOLDERS, STC_FOLDFLAG_LINEBEFORE_CONTRACTED, \
     STC_FOLDFLAG_LINEAFTER_CONTRACTED, STC_MARGIN_NUMBER, STC_STYLE_LINENUMBER, STC_MARKNUM_FOLDER, \
     STC_MARKNUM_FOLDEROPEN, STC_MARKNUM_FOLDERSUB, STC_MARK_BOXPLUS, \
@@ -33,6 +33,7 @@ class MainWindow(MainFrame):
         self.SetIcon(Icon("icons/logo.ico", BITMAP_TYPE_ICO))
         self.Show()
         self.codeEditor.SetText(Hosts.GetSystemHosts())
+        self.Bind(EVT_CLOSE, self.OnWindowClose)
 
     def InitHostView(self):
         self.codeEditor.StyleSetSpec(stc.STC_C_COMMENT, "fore: #00ff00")

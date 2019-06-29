@@ -1,0 +1,56 @@
+from wx import MenuItem, Icon, BITMAP_TYPE_ICO, Menu, EVT_MENU, NewId, adv, ITEM_CHECK
+from wx.adv import TaskBarIcon
+
+
+class TrayIcon(TaskBarIcon):
+    ID_EXIT = NewId()
+    ID_UPDATE = NewId()
+    ID_TOGGLE = NewId()
+    ID_REFRESH_DNS = NewId()
+    ID_NEW = NewId()
+    ID_IMPORT = NewId()
+    __window = None
+    menu = None
+
+    def __init__(self, window):
+        TaskBarIcon.__init__(self)
+        self.__window = window
+        self.SetIcon(Icon("icons/logo.ico", BITMAP_TYPE_ICO))
+        self.Bind(adv.EVT_TASKBAR_LEFT_DCLICK, self.ToggleWindow)
+        ids = [
+            self.ID_IMPORT,
+            self.ID_NEW,
+            self.ID_REFRESH_DNS,
+            self.ID_TOGGLE,
+            self.ID_EXIT,
+            self.ID_UPDATE
+        ]
+        for itemId in ids:
+            self.Bind(EVT_MENU, window.OnMenuClicked, id=itemId)
+
+    def CreatePopupMenu(self):
+        menu = Menu()
+        menu.Append(self.ID_TOGGLE, r"%s主窗口" % ("隐藏" if self.__window.IsShown() else "显示"))
+        menu.Append(self.ID_REFRESH_DNS, u"刷新DNS缓存")
+        menu.AppendSeparator()
+        for hosts in self.__window.hostsList:
+            itemId = NewId()
+            hosts.SetId(itemId)
+            item = MenuItem(menu, itemId, hosts.title, kind=ITEM_CHECK)
+            menu.Append(item)
+            menu.Check(itemId, hosts.IsActive())
+            self.Bind(EVT_MENU, self.__window.OnHostsMenuClicked, id=itemId)
+
+        newHostMenu = Menu()
+        newHostMenu.Append(self.ID_NEW, "新建")
+        newHostMenu.Append(self.ID_IMPORT, "导入")
+        menu.Append(-1, "新建Hosts方案", newHostMenu)
+
+        menu.AppendSeparator()
+        menu.Append(self.ID_UPDATE, "更新")
+        menu.Append(self.ID_EXIT, "退出")
+        self.menu = menu
+        return menu
+
+    def ToggleWindow(self, event):
+        self.__window.ToggleWindow()

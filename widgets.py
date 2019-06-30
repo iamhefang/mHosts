@@ -112,7 +112,7 @@ class AboutDialog(Dialog):
         bSizer2 = BoxSizer(VERTICAL)
 
         self.htmlWindow = HtmlView(self)
-        bSizer2.Add(self.htmlWindow, 0, EXPAND, 5)
+        bSizer2.Add(self.htmlWindow, 0, EXPAND, 0)
 
         self.SetSizer(bSizer2)
         self.Layout()

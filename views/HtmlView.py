@@ -22,9 +22,7 @@ class HtmlView(HtmlWindow):
 <h1>mHosts %(version)s</h1>
 <h2>好用的跨平台Hosts管理工具</h2>
 </body>
-</html>""" % {
-            "version": version
-        })
+</html>""" % {"version": version})
 
     def OnLinkClicked(self, link):
         LaunchDefaultBrowser(link.GetHref())

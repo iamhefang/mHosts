@@ -27,6 +27,16 @@ def ReadLines(file, encoding="utf-8"):
         return file.readlines()
 
 
+def WriteText(file, text, encoding="utf-8"):
+    with open(file, mode="w+", encoding=encoding) as file:
+        return file.write(text)
+
+
+def WriteLines(file, lines, encoding="utf-8"):
+    with open(file, mode="w+", encoding=encoding) as file:
+        return file.writelines(lines)
+
+
 def GetChromePath():
     path = None
     if sys.platform == "win32":
@@ -36,5 +46,5 @@ def GetChromePath():
         if os.path.exists(path):
             path = '"%s"' % path
     elif sys.platform == "linux":
-        path = "/opt/chrome/"
+        path = "google-chrome"
     return path

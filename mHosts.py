@@ -1,10 +1,11 @@
 # _*_ coding: utf-8 _*_
 import sys
 
+from settings import Settings
 from views.MainWindow import MainWindow
 
 if __name__ == '__main__':
-
+    Settings.Init()
     if sys.platform == "win32":
         # 开启在Windows系统中高分屏适配
         # 方案来自 https://groups.google.com/forum/#!topic/wxpython-dev/vOhFapVJneU

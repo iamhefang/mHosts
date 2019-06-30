@@ -1,21 +1,32 @@
 from wx import MenuItem, Icon, BITMAP_TYPE_ICO, Menu, EVT_MENU, NewId, adv, ITEM_CHECK
 from wx.adv import TaskBarIcon
 
+from helpers import GetChromePath, iconPath
+
 
 class TrayIcon(TaskBarIcon):
     ID_EXIT = NewId()
     ID_UPDATE = NewId()
     ID_TOGGLE = NewId()
     ID_REFRESH_DNS = NewId()
+    # 新建Hosts
     ID_NEW = NewId()
+    # 导入Hosts
     ID_IMPORT = NewId()
+    # 启动Chrome
+    ID_LUNCH_CHROME = NewId()
+    # 允许跨域启动Chrome
+    ID_LUNCH_CHROME_CROS = NewId()
+    # 禁用插件
+    ID_LUNCH_CHROME_NO_PLUGINS = NewId()
+
     __window = None
     menu = None
 
     def __init__(self, window):
         TaskBarIcon.__init__(self)
         self.__window = window
-        self.SetIcon(Icon("icons/logo.ico", BITMAP_TYPE_ICO))
+        self.SetIcon(Icon(iconPath, BITMAP_TYPE_ICO))
         self.Bind(adv.EVT_TASKBAR_LEFT_DCLICK, self.ToggleWindow)
         ids = [
             self.ID_IMPORT,
@@ -23,7 +34,10 @@ class TrayIcon(TaskBarIcon):
             self.ID_REFRESH_DNS,
             self.ID_TOGGLE,
             self.ID_EXIT,
-            self.ID_UPDATE
+            self.ID_UPDATE,
+            self.ID_LUNCH_CHROME,
+            self.ID_LUNCH_CHROME_CROS,
+            self.ID_LUNCH_CHROME_NO_PLUGINS
         ]
         for itemId in ids:
             self.Bind(EVT_MENU, window.OnMenuClicked, id=itemId)
@@ -45,6 +59,16 @@ class TrayIcon(TaskBarIcon):
         newHostMenu.Append(self.ID_NEW, "新建")
         newHostMenu.Append(self.ID_IMPORT, "导入")
         menu.Append(-1, "新建Hosts方案", newHostMenu)
+
+        menu.AppendSeparator()
+
+        chromeMenu = Menu()
+
+        if GetChromePath():
+            chromeMenu.Append(self.ID_LUNCH_CHROME, "直接启动")
+            chromeMenu.Append(self.ID_LUNCH_CHROME_CROS, "允许跨域请求")
+            chromeMenu.Append(self.ID_LUNCH_CHROME_NO_PLUGINS, "禁用所有插件")
+            menu.Append(-1, "启动 Google Chrome 浏览器", chromeMenu)
 
         menu.AppendSeparator()
         menu.Append(self.ID_UPDATE, "更新")

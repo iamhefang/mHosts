@@ -124,6 +124,19 @@
                         <property name="help"></property>
                         <property name="id">wxID_ANY</property>
                         <property name="kind">wxITEM_NORMAL</property>
+                        <property name="label">帮助文档(&amp;D)</property>
+                        <property name="name">menuItemHelp</property>
+                        <property name="permission">none</property>
+                        <property name="shortcut"></property>
+                        <property name="unchecked_bitmap"></property>
+                    </object>
+                    <object class="wxMenuItem" expanded="1">
+                        <property name="bitmap"></property>
+                        <property name="checked">0</property>
+                        <property name="enabled">1</property>
+                        <property name="help"></property>
+                        <property name="id">wxID_ANY</property>
+                        <property name="kind">wxITEM_NORMAL</property>
                         <property name="label">检查更新(&amp;U)</property>
                         <property name="name">menuItemCheckUpdate</property>
                         <property name="permission">none</property>
@@ -262,7 +275,7 @@
                         <property name="fg"></property>
                         <property name="floatable">1</property>
                         <property name="folding">1</property>
-                        <property name="font"></property>
+                        <property name="font">,90,90,12,70,0</property>
                         <property name="gripper">0</property>
                         <property name="hidden">0</property>
                         <property name="id">wxID_ANY</property>
@@ -286,13 +299,13 @@
                         <property name="show">1</property>
                         <property name="size"></property>
                         <property name="subclass">; ; forward_declare</property>
-                        <property name="tab_indents">1</property>
+                        <property name="tab_indents">0</property>
                         <property name="tab_width">4</property>
                         <property name="toolbar_pane">0</property>
                         <property name="tooltip"></property>
-                        <property name="use_tabs">1</property>
-                        <property name="view_eol">1</property>
-                        <property name="view_whitespace">1</property>
+                        <property name="use_tabs">0</property>
+                        <property name="view_eol">0</property>
+                        <property name="view_whitespace">0</property>
                         <property name="window_extra_style"></property>
                         <property name="window_name"></property>
                         <property name="window_style"></property>

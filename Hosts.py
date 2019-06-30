@@ -1,18 +1,20 @@
 import os
 import sys
 
-from helpers import ReadText
+from helpers import ReadText, ReadLines
 
 
 class Hosts(object):
     __id = None
     __content = ""
     __active = False
+    __lines = []
     title = ""
 
     def __init__(self, title, path):
         self.title = title
-        self.__content = ReadText(path)
+        self.__lines = ReadLines(path)
+        self.__content = "".join(self.__lines)
 
     def SetId(self, hostsId):
         self.__id = hostsId
@@ -25,6 +27,23 @@ class Hosts(object):
 
     def IsActive(self):
         return self.__active
+
+    def GetLineCount(self):
+        return len(self.__lines)
+
+    def save(self):
+        """
+        保存
+        :return: bool
+        """
+        pass
+
+    def apply(self):
+        """
+        应用到系统
+        :return:
+        """
+        pass
 
     @staticmethod
     def GetHostsPath():

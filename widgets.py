@@ -1,71 +1,88 @@
 # -*- coding: utf-8 -*-
 
-###########################################################################
-## Python code generated with wxFormBuilder (version Oct 26 2018)
-## http://www.wxformbuilder.org/
-##
-## PLEASE DO *NOT* EDIT THIS FILE!
-###########################################################################
+from wx import Frame, DEFAULT_FRAME_STYLE, SYSTEM_MENU, TAB_TRAVERSAL, MenuBar, Menu, MenuItem, ITEM_NORMAL, StatusBar, \
+    STB_SIZEGRIP, Font, FONTFAMILY_DEFAULT, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL, \
+    EmptyString, HORIZONTAL, TreeCtrl, Point, TR_DEFAULT_STYLE, EVT_MENU, Dialog, ID_ANY, DefaultPosition, \
+    DEFAULT_DIALOG_STYLE, \
+    Size, DefaultSize, Icon, BITMAP_TYPE_ICO, BoxSizer, VERTICAL, EXPAND, BOTH
 
-import wx
-import wx.html
-import wx.xrc
-###########################################################################
-## Class MainFrame
-###########################################################################
-from wx import stc
+from helpers import iconPath
+from version import version
+from views.CodeView import CodeView
+from views.HtmlView import HtmlView
 
 
-class MainFrame(wx.Frame):
+class MainFrame(Frame):
 
     def __init__(self, parent):
-        wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=u"mHosts - v0.0.1", pos=wx.DefaultPosition,
-                          size=wx.Size(700, 500), style=wx.DEFAULT_FRAME_STYLE | wx.SYSTEM_MENU | wx.TAB_TRAVERSAL)
+        Frame.__init__(self, parent, id=ID_ANY, title=u" mHosts - v" + version,
+                       pos=DefaultPosition,
+                       style=DEFAULT_FRAME_STYLE | SYSTEM_MENU | TAB_TRAVERSAL)
+        self.SetIcon(Icon(iconPath, BITMAP_TYPE_ICO))
+        self.SetSize(self.ConvertDialogToPixels(Size(800, 500)))
+        self.SetSizeHints(self.ConvertDialogToPixels(Size(600, 400)), DefaultSize)
 
-        self.SetSizeHints(wx.Size(600, 400), wx.DefaultSize)
-
-        self.menuBar = wx.MenuBar(0)
-        self.menuFile = wx.Menu()
-        self.menuItemNew = wx.MenuItem(self.menuFile, wx.ID_ANY, u"新建(&N)", wx.EmptyString, wx.ITEM_NORMAL)
+        self.menuBar = MenuBar(0)
+        self.menuFile = Menu()
+        self.menuItemNew = MenuItem(self.menuFile, ID_ANY, u"新建(&N)", EmptyString, ITEM_NORMAL)
+        self.menuItemImport = MenuItem(self.menuFile, ID_ANY, u"导入(&I)", EmptyString, ITEM_NORMAL)
         self.menuFile.Append(self.menuItemNew)
+        self.menuFile.Append(self.menuItemImport)
 
         self.menuFile.AppendSeparator()
 
-        self.menuItemExit = wx.MenuItem(self.menuFile, wx.ID_ANY, u"退出(&Q)", wx.EmptyString, wx.ITEM_NORMAL)
+        self.menuItemExit = MenuItem(self.menuFile, ID_ANY, u"退出(&Q)", EmptyString, ITEM_NORMAL)
         self.menuFile.Append(self.menuItemExit)
 
         self.menuBar.Append(self.menuFile, u"文件(&F)")
 
-        self.menuHelp = wx.Menu()
-        self.menuItemCheckUpdate = wx.MenuItem(self.menuHelp, wx.ID_ANY, u"检查更新(&U)", wx.EmptyString, wx.ITEM_NORMAL)
+        self.menuHelp = Menu()
+
+        self.menuItemSettings = MenuItem(self.menuHelp, ID_ANY, u"首选项(&P)", EmptyString, ITEM_NORMAL)
+        self.menuHelp.Append(self.menuItemSettings)
+
+        self.menuItemHelpDoc = MenuItem(self.menuHelp, ID_ANY, u"帮助文档(&D)", EmptyString, ITEM_NORMAL)
+        self.menuHelp.Append(self.menuItemHelpDoc)
+
+        self.menuItemCheckUpdate = MenuItem(self.menuHelp, ID_ANY, u"检查更新(&U)", EmptyString, ITEM_NORMAL)
         self.menuHelp.Append(self.menuItemCheckUpdate)
 
-        self.menuItemAbout = wx.MenuItem(self.menuHelp, wx.ID_ANY, u"关于(&A)", wx.EmptyString, wx.ITEM_NORMAL)
+        self.menuItemAbout = MenuItem(self.menuHelp, ID_ANY, u"关于(&A)", EmptyString, ITEM_NORMAL)
         self.menuHelp.Append(self.menuItemAbout)
 
         self.menuBar.Append(self.menuHelp, u"帮助(&H)")
 
         self.SetMenuBar(self.menuBar)
 
-        self.statusBar = self.CreateStatusBar(1, wx.STB_SIZEGRIP, wx.ID_ANY)
-        bSizer1 = wx.BoxSizer(wx.HORIZONTAL)
+        self.statusBar = StatusBar(self, ID_ANY, STB_SIZEGRIP)
+        statusBarFont = Font(10, FONTFAMILY_DEFAULT, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL, False,
+                             EmptyString)
+        self.statusBar.SetFont(statusBarFont)
+        self.SetStatusBar(self.statusBar)
 
-        self.hostsTree = wx.TreeCtrl(self, wx.ID_ANY, wx.Point(0, 0), wx.Size(200, -1), wx.TR_DEFAULT_STYLE)
-        bSizer1.Add(self.hostsTree, 0, wx.EXPAND, 5)
+        # self.statusBar = self.CreateStatusBar(1, STB_SIZEGRIP, ID_ANY)
+        bSizer1 = BoxSizer(HORIZONTAL)
+
+        self.hostsTree = TreeCtrl(self, ID_ANY, Point(0, 0), self.ConvertDialogToPixels(Size(200, -1)),
+                                  TR_DEFAULT_STYLE)
+        bSizer1.Add(self.hostsTree, 0, EXPAND, 5)
 
         # WARNING: wxPython code generation isn't supported for this widget yet.
-        self.codeEditor = stc.StyledTextCtrl(self)
-        bSizer1.Add(self.codeEditor, 1, wx.EXPAND, 5)
+        self.codeEditor = CodeView(self)
+        bSizer1.Add(self.codeEditor, 1, EXPAND, 5)
 
         self.SetSizer(bSizer1)
         self.Layout()
 
-        self.Centre(wx.BOTH)
+        self.Centre(BOTH)
 
         # Connect Events
-        self.Bind(wx.EVT_MENU, self.OnMenuClicked, id=self.menuItemNew.GetId())
-        self.Bind(wx.EVT_MENU, self.OnMenuClicked, id=self.menuItemExit.GetId())
-        self.Bind(wx.EVT_MENU, self.OnMenuClicked, id=self.menuItemAbout.GetId())
+        self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemNew.GetId())
+        self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemExit.GetId())
+        self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemAbout.GetId())
+        self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemHelpDoc.GetId())
+        self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemSettings.GetId())
+        self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemImport.GetId())
 
     def __del__(self):
         pass
@@ -79,24 +96,28 @@ class MainFrame(wx.Frame):
 ## Class AboutDialog
 ###########################################################################
 
-class AboutDialog(wx.Dialog):
+class AboutDialog(Dialog):
 
     def __init__(self, parent):
-        wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title=u"关于", pos=wx.DefaultPosition, size=wx.Size(400, 300),
-                           style=wx.DEFAULT_DIALOG_STYLE)
+        Dialog.__init__(
+            self, parent,
+            id=ID_ANY,
+            title=u" 关于 mHosts - v%s" % version,
+            pos=DefaultPosition,
+            style=DEFAULT_DIALOG_STYLE
+        )
+        self.SetSize(self.ConvertDialogToPixels(Size(400, 300)))
+        self.SetSizeHints(DefaultSize, DefaultSize)
+        self.SetIcon(Icon(iconPath, BITMAP_TYPE_ICO))
+        bSizer2 = BoxSizer(VERTICAL)
 
-        self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
-
-        bSizer2 = wx.BoxSizer(wx.VERTICAL)
-
-        self.htmlWindow = wx.html.HtmlWindow(self, wx.ID_ANY, wx.DefaultPosition, wx.Size(400, 300),
-                                             wx.html.HW_SCROLLBAR_AUTO)
-        bSizer2.Add(self.htmlWindow, 0, wx.EXPAND, 5)
+        self.htmlWindow = HtmlView(self)
+        bSizer2.Add(self.htmlWindow, 0, EXPAND, 5)
 
         self.SetSizer(bSizer2)
         self.Layout()
 
-        self.Centre(wx.BOTH)
+        self.Centre(BOTH)
 
     def __del__(self):
         pass

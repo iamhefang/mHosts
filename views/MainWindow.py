@@ -1,16 +1,12 @@
+import os
 import sys
 import traceback
 
-from wx import App, Icon, BITMAP_TYPE_ICO, MessageBox, ICON_ERROR, OK, ICON_NONE, stc, \
-    SystemSettings, SYS_COLOUR_HIGHLIGHTTEXT, SYS_COLOUR_HIGHLIGHT, Colour, EVT_CLOSE
-from wx.stc import STC_MARGIN_SYMBOL, STC_MASK_FOLDERS, STC_FOLDFLAG_LINEBEFORE_CONTRACTED, \
-    STC_FOLDFLAG_LINEAFTER_CONTRACTED, STC_MARGIN_NUMBER, STC_STYLE_LINENUMBER, STC_MARKNUM_FOLDER, \
-    STC_MARKNUM_FOLDEROPEN, STC_MARKNUM_FOLDERSUB, STC_MARK_BOXPLUS, \
-    STC_MARKNUM_FOLDEREND, STC_MARK_BOXMINUS, \
-    STC_MARKNUM_FOLDEROPENMID, STC_MARKNUM_FOLDERMIDTAIL, STC_MARKNUM_FOLDERTAIL, STC_MARK_EMPTY
+from wx import App, MessageBox, ICON_ERROR, OK, ICON_NONE, EVT_CLOSE, LaunchDefaultBrowser, EVT_TREE_ITEM_ACTIVATED
 
 from Hosts import Hosts
-from helpers import FetchCurrentVersion
+from helpers import GetChromePath
+from version import version
 from views.TrayIcon import TrayIcon
 from widgets import MainFrame, AboutDialog
 
@@ -27,50 +23,22 @@ class MainWindow(MainFrame):
         self.trayIcon = TrayIcon(self)
         self.aboutDialog = AboutDialog(self)
         self.InitMainWindow()
+        root = self.hostsTree.AddRoot("全部Hosts")
+        for hosts in self.hostsList:
+            self.hostsTree.AppendItem(root, hosts.title)
+        self.hostsTree.ExpandAll()
 
     def InitMainWindow(self):
-        self.SetTitle(u"mHosts - v" + FetchCurrentVersion())
-        self.SetIcon(Icon("icons/logo.ico", BITMAP_TYPE_ICO))
         self.Show()
         self.codeEditor.SetText(Hosts.GetSystemHosts())
         self.Bind(EVT_CLOSE, self.OnWindowClose)
+        self.statusBar.SetFieldsCount(2)
+        self.SetStatusWidths([-1, -3])
+        self.statusBar.SetStatusText("当前共%d个Hosts规则" % len(self.hostsList), 0)
+        self.hostsTree.Bind(EVT_TREE_ITEM_ACTIVATED, self.OnHostTreeItemClicked)
 
-    def InitHostView(self):
-        self.codeEditor.StyleSetSpec(stc.STC_C_COMMENT, "fore: #00ff00")
-        self.codeEditor.SetUseTabs(False)
-        self.codeEditor.SetTabWidth(4)
-        self.codeEditor.SetIndent(4)
-        self.codeEditor.SetTabIndents(True)
-        self.codeEditor.SetBackSpaceUnIndents(True)
-        self.codeEditor.SetViewEOL(False)
-        self.codeEditor.SetViewWhiteSpace(False)
-        self.codeEditor.SetMarginWidth(2, 0)
-        self.codeEditor.SetIndentationGuides(True)
-        self.codeEditor.SetMarginType(1, STC_MARGIN_SYMBOL)
-        self.codeEditor.SetMarginMask(1, STC_MASK_FOLDERS)
-        self.codeEditor.SetMarginWidth(1, 16)
-        self.codeEditor.SetMarginSensitive(1, True)
-        self.codeEditor.SetProperty(u"fold", u"1")
-        self.codeEditor.SetFoldFlags(STC_FOLDFLAG_LINEBEFORE_CONTRACTED | STC_FOLDFLAG_LINEAFTER_CONTRACTED)
-        self.codeEditor.SetMarginType(0, STC_MARGIN_NUMBER)
-        self.codeEditor.SetMarginWidth(0, self.codeEditor.TextWidth(STC_STYLE_LINENUMBER, u"_99999"))
-        self.codeEditor.MarkerDefine(STC_MARKNUM_FOLDER, STC_MARK_BOXPLUS)
-        self.codeEditor.MarkerSetBackground(STC_MARKNUM_FOLDER, Colour(u"BLACK"))
-        self.codeEditor.MarkerSetForeground(STC_MARKNUM_FOLDER, Colour(u"WHITE"))
-        self.codeEditor.MarkerDefine(STC_MARKNUM_FOLDEROPEN, STC_MARK_BOXMINUS)
-        self.codeEditor.MarkerSetBackground(STC_MARKNUM_FOLDEROPEN, Colour(u"BLACK"))
-        self.codeEditor.MarkerSetForeground(STC_MARKNUM_FOLDEROPEN, Colour(u"WHITE"))
-        self.codeEditor.MarkerDefine(STC_MARKNUM_FOLDERSUB, STC_MARK_EMPTY)
-        self.codeEditor.MarkerDefine(STC_MARKNUM_FOLDEREND, STC_MARK_BOXPLUS)
-        self.codeEditor.MarkerSetBackground(STC_MARKNUM_FOLDEREND, Colour(u"BLACK"))
-        self.codeEditor.MarkerSetForeground(STC_MARKNUM_FOLDEREND, Colour(u"WHITE"))
-        self.codeEditor.MarkerDefine(STC_MARKNUM_FOLDEROPENMID, STC_MARK_BOXMINUS)
-        self.codeEditor.MarkerSetBackground(STC_MARKNUM_FOLDEROPENMID, Colour(u"BLACK"))
-        self.codeEditor.MarkerSetForeground(STC_MARKNUM_FOLDEROPENMID, Colour(u"WHITE"))
-        self.codeEditor.MarkerDefine(STC_MARKNUM_FOLDERMIDTAIL, STC_MARK_EMPTY)
-        self.codeEditor.MarkerDefine(STC_MARKNUM_FOLDERTAIL, STC_MARK_EMPTY)
-        self.codeEditor.SetSelBackground(True, SystemSettings.GetColour(SYS_COLOUR_HIGHLIGHT))
-        self.codeEditor.SetSelForeground(True, SystemSettings.GetColour(SYS_COLOUR_HIGHLIGHTTEXT))
+    def OnHostTreeItemClicked(self, event):
+        event.Skip()
 
     def OnCodeEditorKeyUp(self, event):
         if event.cmdDown and event.KeyCode == 83:
@@ -104,18 +72,37 @@ class MainWindow(MainFrame):
             hosts.SetActive(hosts.GetId() == event.GetId())
 
     def OnMenuClicked(self, event):
-        callback = {
-                       self.menuItemExit.GetId(): self.Exit,
-                       self.menuItemAbout.GetId(): self.ShowAboutDialog,
-                       TrayIcon.ID_EXIT: self.Exit,
-                       TrayIcon.ID_TOGGLE: self.ToggleWindow,
-                       TrayIcon.ID_REFRESH_DNS: MainWindow.DoRefreshDNS,
-                       TrayIcon.ID_NEW: None,
-                       TrayIcon.ID_IMPORT: None
-                   }[event.GetId()] or None
+        handlers = {
+            self.menuItemExit.GetId(): self.Exit,
+            self.menuItemAbout.GetId(): self.ShowAboutDialog,
+            self.menuItemHelpDoc.GetId(): lambda: LaunchDefaultBrowser("https://hefang.link/url/mhosts-doc"),
+            TrayIcon.ID_EXIT: self.Exit,
+            TrayIcon.ID_TOGGLE: self.ToggleWindow,
+            TrayIcon.ID_REFRESH_DNS: MainWindow.DoRefreshDNS,
+            TrayIcon.ID_NEW: None,
+            TrayIcon.ID_IMPORT: None,
+            TrayIcon.ID_LUNCH_CHROME: lambda: MainWindow.LunchChrome(),
+            TrayIcon.ID_LUNCH_CHROME_CROS: lambda: MainWindow.LunchChrome("--disable-web-security --user-data-dir"),
+            TrayIcon.ID_LUNCH_CHROME_NO_PLUGINS: lambda: MainWindow.LunchChrome(
+                "--disable-plugins --disable-extensions"),
+        }
+        if event.GetId() in handlers:
+            callback = handlers[event.GetId()]
+            if callable(callback):
+                callback()
+            else:
+                print("该菜单绑定的事件不可用")
+        else:
+            print("该菜单没有绑定事件")
 
-        if callback:
-            callback()
+    @staticmethod
+    def LunchChrome(args=""):
+        chromePath = GetChromePath()
+        if chromePath:
+            cmd = u'%s %s' % (chromePath, args)
+            print("当前Chrome命令为: " + cmd)
+            os.system(cmd)
+        pass
 
     @staticmethod
     def DoRefreshDNS():
@@ -135,6 +122,6 @@ class MainWindow(MainFrame):
 
     @staticmethod
     def PrintSysInfo():
-        print("版本：", FetchCurrentVersion())
+        print("版本：", version)
         print("系统：", sys.platform)
         print("hosts:", Hosts.GetHostsPath())

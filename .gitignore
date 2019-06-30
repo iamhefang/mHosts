@@ -4,5 +4,7 @@
 test/
 temp/
 /venv/
+/dist/
+/build/
 *.iml
 __pycache__/

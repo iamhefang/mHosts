@@ -1,12 +1,13 @@
 from wx import ID_ANY, DefaultPosition, Size, html, LaunchDefaultBrowser
 from wx.html import HtmlWindow
 
-from helpers import FetchCurrentVersion
+from version import version
 
 
 class HtmlView(HtmlWindow):
-    def __init__(self):
-        HtmlWindow.__init__(self, ID_ANY, DefaultPosition, Size(400, 300), html.HW_SCROLLBAR_AUTO)
+    def __init__(self, parent):
+        HtmlWindow.__init__(self, parent, ID_ANY, DefaultPosition, style=html.HW_SCROLLBAR_AUTO)
+        self.SetSize(self.ConvertDialogToPixels(Size(400, 300)))
         self.SetPage("""
 <!doctype html>
 <html lang="zh">
@@ -22,7 +23,7 @@ class HtmlView(HtmlWindow):
 <h2>好用的跨平台Hosts管理工具</h2>
 </body>
 </html>""" % {
-            "version": FetchCurrentVersion()
+            "version": version
         })
 
     def OnLinkClicked(self, link):

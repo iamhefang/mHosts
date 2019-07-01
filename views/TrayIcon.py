@@ -1,7 +1,8 @@
-from wx import MenuItem, Icon, BITMAP_TYPE_ICO, Menu, EVT_MENU, NewId, adv, ITEM_CHECK
+from wx import MenuItem, Icon, BITMAP_TYPE_ICO, Menu, EVT_MENU, NewId, adv, ITEM_CHECK, ID_ANY
 from wx.adv import TaskBarIcon
 
-from helpers import GetChromePath, iconPath
+from helpers import iconPath
+from settings import Settings
 
 
 class TrayIcon(TaskBarIcon):
@@ -44,8 +45,8 @@ class TrayIcon(TaskBarIcon):
 
     def CreatePopupMenu(self):
         menu = Menu()
+        menu.Append(ID_ANY, "mHosts").Enable(False)
         menu.Append(self.ID_TOGGLE, r"%s主窗口" % ("隐藏" if self.__window.IsShown() else "显示"))
-        menu.Append(self.ID_REFRESH_DNS, u"刷新DNS缓存")
         menu.AppendSeparator()
         for hosts in self.__window.hostsList:
             itemId = NewId()
@@ -61,10 +62,9 @@ class TrayIcon(TaskBarIcon):
         menu.Append(-1, "新建Hosts方案", newHostMenu)
 
         menu.AppendSeparator()
-
-        chromeMenu = Menu()
-
-        if GetChromePath():
+        menu.Append(self.ID_REFRESH_DNS, u"刷新DNS缓存")
+        if Settings.settings["chrome-path"]:
+            chromeMenu = Menu()
             chromeMenu.Append(self.ID_LUNCH_CHROME, "直接启动")
             chromeMenu.Append(self.ID_LUNCH_CHROME_CROS, "允许跨域请求")
             chromeMenu.Append(self.ID_LUNCH_CHROME_NO_PLUGINS, "禁用所有插件")

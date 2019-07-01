@@ -2,15 +2,17 @@ import os
 import sys
 import traceback
 
-from wx import App, MessageBox, ICON_ERROR, OK, ICON_NONE, EVT_CLOSE, LaunchDefaultBrowser, EVT_TREE_ITEM_ACTIVATED
+from wx import App, MessageBox, ICON_ERROR, OK, ICON_NONE, EVT_CLOSE, LaunchDefaultBrowser, EVT_TREE_ITEM_ACTIVATED, \
+    DisplaySize
 
 from Hosts import Hosts
-from helpers import GetChromePath
+from settings import Settings
 from version import version
 from views.TrayIcon import TrayIcon
 from widgets import MainFrame, AboutDialog
 
 
+# noinspection PyPep8Naming
 class MainWindow(MainFrame):
     hostsList = [
         Hosts("当前系统", Hosts.GetHostsPath()),
@@ -23,10 +25,13 @@ class MainWindow(MainFrame):
         self.trayIcon = TrayIcon(self)
         self.aboutDialog = AboutDialog(self)
         self.InitMainWindow()
+        print(DisplaySize())
         root = self.hostsTree.AddRoot("全部Hosts")
         for hosts in self.hostsList:
             self.hostsTree.AppendItem(root, hosts.title)
         self.hostsTree.ExpandAll()
+        # for hosts in self.hostsList:
+        #     self.hostsListView.Append(hosts.title)
 
     def InitMainWindow(self):
         self.Show()
@@ -82,9 +87,12 @@ class MainWindow(MainFrame):
             TrayIcon.ID_NEW: None,
             TrayIcon.ID_IMPORT: None,
             TrayIcon.ID_LUNCH_CHROME: lambda: MainWindow.LunchChrome(),
-            TrayIcon.ID_LUNCH_CHROME_CROS: lambda: MainWindow.LunchChrome("--disable-web-security --user-data-dir"),
+            TrayIcon.ID_LUNCH_CHROME_CROS: lambda: MainWindow.LunchChrome(
+                "--disable-web-security --user-data-dir"
+            ),
             TrayIcon.ID_LUNCH_CHROME_NO_PLUGINS: lambda: MainWindow.LunchChrome(
-                "--disable-plugins --disable-extensions"),
+                "--disable-plugins --disable-extensions"
+            ),
         }
         if event.GetId() in handlers:
             callback = handlers[event.GetId()]
@@ -97,12 +105,13 @@ class MainWindow(MainFrame):
 
     @staticmethod
     def LunchChrome(args=""):
-        chromePath = GetChromePath()
+        chromePath = Settings.settings["chrome-path"]
         if chromePath:
+            if ' ' in chromePath:
+                chromePath = '"%s"' % chromePath
             cmd = u'%s %s' % (chromePath, args)
             print("当前Chrome命令为: " + cmd)
             os.system(cmd)
-        pass
 
     @staticmethod
     def DoRefreshDNS():

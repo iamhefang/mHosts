@@ -43,8 +43,8 @@ def GetChromePath():
         path = u'%s\\Google\\Chrome\\Application\\chrome.exe' % os.environ["PROGRAMFILES(X86)"]
         if not os.path.exists(path):
             path = u'%s\\Google\\Chrome\\Application\\chrome.exe' % os.environ["PROGRAMFILES"]
-        if os.path.exists(path):
-            path = '"%s"' % path
+        # if os.path.exists(path):
+        #     path = '"%s"' % path
     elif sys.platform == "linux":
         path = "google-chrome"
     return path

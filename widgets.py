@@ -4,7 +4,7 @@ from wx import Frame, DEFAULT_FRAME_STYLE, SYSTEM_MENU, TAB_TRAVERSAL, MenuBar, 
     STB_SIZEGRIP, Font, FONTFAMILY_DEFAULT, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL, \
     EmptyString, HORIZONTAL, TreeCtrl, Point, TR_DEFAULT_STYLE, EVT_MENU, Dialog, ID_ANY, DefaultPosition, \
     DEFAULT_DIALOG_STYLE, \
-    Size, DefaultSize, Icon, BITMAP_TYPE_ICO, BoxSizer, VERTICAL, EXPAND, BOTH
+    Size, DefaultSize, Icon, BITMAP_TYPE_ICO, BoxSizer, VERTICAL, EXPAND, BOTH, DisplaySize
 
 from helpers import iconPath
 from version import version
@@ -18,9 +18,10 @@ class MainFrame(Frame):
         Frame.__init__(self, parent, id=ID_ANY, title=u" mHosts - v" + version,
                        pos=DefaultPosition,
                        style=DEFAULT_FRAME_STYLE | SYSTEM_MENU | TAB_TRAVERSAL)
+        size = DisplaySize()
         self.SetIcon(Icon(iconPath, BITMAP_TYPE_ICO))
-        self.SetSize(self.ConvertDialogToPixels(Size(800, 500)))
-        self.SetSizeHints(self.ConvertDialogToPixels(Size(600, 400)), DefaultSize)
+        self.SetSize(Size(size[0] / 2, size[1] / 1.5))
+        self.SetSizeHints(Size(size[0] / 3, size[1] / 2.5), DefaultSize)
 
         self.menuBar = MenuBar(0)
         self.menuFile = Menu()
@@ -63,9 +64,16 @@ class MainFrame(Frame):
         # self.statusBar = self.CreateStatusBar(1, STB_SIZEGRIP, ID_ANY)
         bSizer1 = BoxSizer(HORIZONTAL)
 
-        self.hostsTree = TreeCtrl(self, ID_ANY, Point(0, 0), self.ConvertDialogToPixels(Size(200, -1)),
-                                  TR_DEFAULT_STYLE)
+        self.hostsTree = TreeCtrl(
+            self, ID_ANY,
+            Point(0, 0),
+            Size(size[0] / 9, -1),
+            TR_DEFAULT_STYLE
+        )
         bSizer1.Add(self.hostsTree, 0, EXPAND, 5)
+
+        # self.hostsListView = CheckListBox(self, size=Size(size[0] / 9, -1))
+        # bSizer1.Add(self.hostsListView, 0, EXPAND, 5)
 
         # WARNING: wxPython code generation isn't supported for this widget yet.
         self.codeEditor = CodeView(self)
@@ -106,6 +114,7 @@ class AboutDialog(Dialog):
             pos=DefaultPosition,
             style=DEFAULT_DIALOG_STYLE
         )
+        size = DisplaySize()
         self.SetSize(self.ConvertDialogToPixels(Size(400, 300)))
         self.SetSizeHints(DefaultSize, DefaultSize)
         self.SetIcon(Icon(iconPath, BITMAP_TYPE_ICO))

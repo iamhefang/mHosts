@@ -3,7 +3,7 @@ import sys
 import traceback
 
 from wx import App, MessageBox, ICON_ERROR, OK, ICON_NONE, EVT_CLOSE, LaunchDefaultBrowser, EVT_TREE_ITEM_ACTIVATED, \
-    DisplaySize
+    DisplaySize, Size
 
 from Hosts import Hosts
 from settings import Settings
@@ -19,19 +19,28 @@ class MainWindow(MainFrame):
         Hosts("Hosts 1", Hosts.GetHostsPath())
     ]
     app = App()
+    size = DisplaySize()
+    dpiX = 1
+    dpiY = 1
 
     def __init__(self):
-        MainFrame.__init__(self, None)
+        realSize = DisplaySize()
+        self.dpiX = realSize[0] / self.size[0]
+        self.dpiY = realSize[1] / self.size[1]
+        MainFrame.__init__(self, None, dpi=(self.dpiY, self.dpiY))
         self.trayIcon = TrayIcon(self)
-        self.aboutDialog = AboutDialog(self)
+        self.aboutDialog = AboutDialog(self, dpi=(self.dpiY, self.dpiY))
+
         self.InitMainWindow()
-        print(DisplaySize())
         root = self.hostsTree.AddRoot("全部Hosts")
         for hosts in self.hostsList:
             self.hostsTree.AppendItem(root, hosts.title)
         self.hostsTree.ExpandAll()
         # for hosts in self.hostsList:
         #     self.hostsListView.Append(hosts.title)
+
+    def Size(self, width, height):
+        return Size(width * self.dpiX, height * self.dpiY)
 
     def InitMainWindow(self):
         self.Show()

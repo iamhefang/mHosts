@@ -4,7 +4,7 @@ from wx import Frame, DEFAULT_FRAME_STYLE, SYSTEM_MENU, TAB_TRAVERSAL, MenuBar, 
     STB_SIZEGRIP, Font, FONTFAMILY_DEFAULT, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL, \
     EmptyString, HORIZONTAL, TreeCtrl, Point, TR_DEFAULT_STYLE, EVT_MENU, Dialog, ID_ANY, DefaultPosition, \
     DEFAULT_DIALOG_STYLE, \
-    Size, DefaultSize, Icon, BITMAP_TYPE_ICO, BoxSizer, VERTICAL, EXPAND, BOTH, DisplaySize
+    Size, DefaultSize, Icon, BITMAP_TYPE_ICO, BoxSizer, VERTICAL, EXPAND, BOTH
 
 from helpers import iconPath
 from version import version
@@ -14,14 +14,14 @@ from views.HtmlView import HtmlView
 
 class MainFrame(Frame):
 
-    def __init__(self, parent):
+    def __init__(self, parent, dpi=(1, 1)):
         Frame.__init__(self, parent, id=ID_ANY, title=u" mHosts - v" + version,
                        pos=DefaultPosition,
+                       size=Size(700 * dpi[0], 500 * dpi[1]),
                        style=DEFAULT_FRAME_STYLE | SYSTEM_MENU | TAB_TRAVERSAL)
-        size = DisplaySize()
         self.SetIcon(Icon(iconPath, BITMAP_TYPE_ICO))
-        self.SetSize(Size(size[0] / 2, size[1] / 1.5))
-        self.SetSizeHints(Size(size[0] / 3, size[1] / 2.5), DefaultSize)
+        # self.SetSize(Size(size[0] / 2, size[1] / 1.5))
+        # self.SetSizeHints(Size(size[0] / 3, size[1] / 2.5), DefaultSize)
 
         self.menuBar = MenuBar(0)
         self.menuFile = Menu()
@@ -67,7 +67,7 @@ class MainFrame(Frame):
         self.hostsTree = TreeCtrl(
             self, ID_ANY,
             Point(0, 0),
-            Size(size[0] / 9, -1),
+            Size(180 * dpi[0], -1),
             TR_DEFAULT_STYLE
         )
         bSizer1.Add(self.hostsTree, 0, EXPAND, 5)
@@ -106,21 +106,22 @@ class MainFrame(Frame):
 
 class AboutDialog(Dialog):
 
-    def __init__(self, parent):
+    def __init__(self, parent, dpi=(1, 1)):
         Dialog.__init__(
             self, parent,
             id=ID_ANY,
             title=u" 关于 mHosts - v%s" % version,
             pos=DefaultPosition,
-            style=DEFAULT_DIALOG_STYLE
+            style=DEFAULT_DIALOG_STYLE,
+            size=Size(500 * dpi[0], 400 * dpi[1])
         )
-        size = DisplaySize()
-        self.SetSize(self.ConvertDialogToPixels(Size(400, 300)))
+        # size = DisplaySize()
+        # self.SetSize(self.ConvertDialogToPixels())
         self.SetSizeHints(DefaultSize, DefaultSize)
         self.SetIcon(Icon(iconPath, BITMAP_TYPE_ICO))
         bSizer2 = BoxSizer(VERTICAL)
 
-        self.htmlWindow = HtmlView(self)
+        self.htmlWindow = HtmlView(self, self.GetSize())
         bSizer2.Add(self.htmlWindow, 0, EXPAND, 0)
 
         self.SetSizer(bSizer2)

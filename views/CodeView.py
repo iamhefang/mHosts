@@ -10,13 +10,13 @@ class CodeView(StyledTextCtrl):
         # 设置显示行号
         self.SetMarginType(0, STC_MARGIN_NUMBER)
         # 设置行号显示区域宽度
-        self.SetMarginWidth(0, self.TextWidth(STC_STYLE_LINENUMBER, u"_99999"))
+        self.SetMarginWidth(0, self.TextWidth(STC_STYLE_LINENUMBER, u"_9999"))
         # 不显示换行符
         self.SetViewEOL(False)
         # 不显示空白字符
         self.SetViewWhiteSpace(False)
         # 行号和内容之间留一定的间距
-        self.SetMarginWidth(1, 8)
+        self.SetMarginWidth(1, self.TextWidth(STC_STYLE_LINENUMBER, u"_"))
 
         self.Bind(EVT_KEY_UP, self.OnKeyUp)
 

@@ -3,6 +3,7 @@ from wx.adv import TaskBarIcon
 
 from helpers import iconPath
 from settings import Settings
+from version import version
 
 
 class TrayIcon(TaskBarIcon):
@@ -45,7 +46,7 @@ class TrayIcon(TaskBarIcon):
 
     def CreatePopupMenu(self):
         menu = Menu()
-        menu.Append(ID_ANY, "mHosts").Enable(False)
+        menu.Append(ID_ANY, "mHosts v" + version).Enable(False)
         menu.Append(self.ID_TOGGLE, r"%s主窗口" % ("隐藏" if self.__window.IsShown() else "显示"))
         menu.AppendSeparator()
         for hosts in self.__window.hostsList:

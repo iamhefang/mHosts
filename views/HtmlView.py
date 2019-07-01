@@ -1,13 +1,13 @@
-from wx import ID_ANY, DefaultPosition, Size, html, LaunchDefaultBrowser
+from wx import ID_ANY, DefaultPosition, html, LaunchDefaultBrowser
 from wx.html import HtmlWindow
 
 from version import version
 
 
 class HtmlView(HtmlWindow):
-    def __init__(self, parent):
-        HtmlWindow.__init__(self, parent, ID_ANY, DefaultPosition, style=html.HW_SCROLLBAR_AUTO)
-        self.SetSize(self.ConvertDialogToPixels(Size(400, 300)))
+    def __init__(self, parent, size):
+        HtmlWindow.__init__(self, parent, ID_ANY, DefaultPosition, size=size, style=html.HW_SCROLLBAR_AUTO)
+        # self.SetSize(Size(400, 300))
         self.SetPage("""
 <!doctype html>
 <html lang="zh">
@@ -20,7 +20,15 @@ class HtmlView(HtmlWindow):
 </head>
 <body>
 <h1>mHosts %(version)s</h1>
-<h2>好用的跨平台Hosts管理工具</h2>
+<h4>免费好用的跨平台Hosts管理工具</h4>
+<table style="width:100%%">
+<tr>
+    <td>项目地址:</td>
+    <td>
+        <a href="https://github.com/iamhefang/mHosts">https://github.com/iamhefang/mHosts</a>
+    </td>
+</tr>
+</table>
 </body>
 </html>""" % {"version": version})
 

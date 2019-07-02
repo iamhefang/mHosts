@@ -1,7 +1,7 @@
 from wx import ID_ANY, DefaultPosition, html, LaunchDefaultBrowser
 from wx.html import HtmlWindow
 
-from version import version
+from settings import Settings
 
 
 class HtmlView(HtmlWindow):
@@ -30,7 +30,7 @@ class HtmlView(HtmlWindow):
 </tr>
 </table>
 </body>
-</html>""" % {"version": version})
+</html>""" % {"version": Settings.version()})
 
     def OnLinkClicked(self, link):
         LaunchDefaultBrowser(link.GetHref())

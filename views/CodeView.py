@@ -17,7 +17,7 @@ class CodeView(StyledTextCtrl):
         self.SetViewWhiteSpace(False)
         # 行号和内容之间留一定的间距
         self.SetMarginWidth(1, self.TextWidth(STC_STYLE_LINENUMBER, u"_"))
-
+        self.SetReadOnly(False)
         self.Bind(EVT_KEY_UP, self.OnKeyUp)
 
     def OnKeyUp(self, event):

@@ -4,7 +4,8 @@ block_cipher = None
 
 datas = [
     ('.\icons','icons'),
-    ('.\icons\logo.ico','icons')
+    ('.\icons\logo.ico','icons'),
+    ('.\mHosts.json','.')
 ]
 
 a = Analysis(

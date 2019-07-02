@@ -3,7 +3,6 @@ from wx.adv import TaskBarIcon
 
 from helpers import iconPath
 from settings import Settings
-from version import version
 
 
 class TrayIcon(TaskBarIcon):
@@ -46,16 +45,15 @@ class TrayIcon(TaskBarIcon):
 
     def CreatePopupMenu(self):
         menu = Menu()
-        menu.Append(ID_ANY, "mHosts v" + version).Enable(False)
+        menu.Append(ID_ANY, "mHosts v" + Settings.version()).Enable(False)
         menu.Append(self.ID_TOGGLE, r"%s主窗口" % ("隐藏" if self.__window.IsShown() else "显示"))
         menu.AppendSeparator()
-        for hosts in self.__window.hostsList:
-            itemId = NewId()
-            hosts.SetId(itemId)
-            item = MenuItem(menu, itemId, hosts.title, kind=ITEM_CHECK)
+        for hosts in Settings.settings["hosts"]:
+            item = MenuItem(menu, hosts["id"], hosts["name"], kind=ITEM_CHECK)
+            item.Enable(not hosts['alwaysApply'])
             menu.Append(item)
-            menu.Check(itemId, hosts.IsActive())
-            self.Bind(EVT_MENU, self.__window.OnHostsMenuClicked, id=itemId)
+            menu.Check(hosts["id"], hosts["active"] or hosts["alwaysApply"])
+            self.Bind(EVT_MENU, self.__window.OnTaskBarHostsMenuClicked, id=hosts["id"])
 
         newHostMenu = Menu()
         newHostMenu.Append(self.ID_NEW, "新建")
@@ -64,7 +62,7 @@ class TrayIcon(TaskBarIcon):
 
         menu.AppendSeparator()
         menu.Append(self.ID_REFRESH_DNS, u"刷新DNS缓存")
-        if Settings.settings["chrome-path"]:
+        if Settings.settings["chromePath"]:
             chromeMenu = Menu()
             chromeMenu.Append(self.ID_LUNCH_CHROME, "直接启动")
             chromeMenu.Append(self.ID_LUNCH_CHROME_CROS, "允许跨域请求")

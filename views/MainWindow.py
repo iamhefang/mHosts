@@ -1,23 +1,20 @@
 import os
 import sys
-import traceback
 
-from wx import App, MessageBox, ICON_ERROR, OK, ICON_NONE, EVT_CLOSE, LaunchDefaultBrowser, EVT_TREE_ITEM_ACTIVATED, \
-    DisplaySize, Size
+from wx import App, MessageBox, ICON_ERROR, OK, ICON_NONE, EVT_CLOSE, LaunchDefaultBrowser, DisplaySize, \
+    EVT_TREE_SEL_CHANGED, EVT_TREE_ITEM_RIGHT_CLICK, Menu, ID_ANY
 
-from Hosts import Hosts
-from settings import Settings
-from version import version
+import Hosts
+from settings import Settings, systemHosts, ID_SYSTEM_HOSTS
 from views.TrayIcon import TrayIcon
-from widgets import MainFrame, AboutDialog
+from widgets import MainFrame, AboutDialog, EditDialog
+
+
+# import traceback
 
 
 # noinspection PyPep8Naming
 class MainWindow(MainFrame):
-    hostsList = [
-        Hosts("当前系统", Hosts.GetHostsPath()),
-        Hosts("Hosts 1", Hosts.GetHostsPath())
-    ]
     app = App()
     size = DisplaySize()
     dpiX = 1
@@ -30,42 +27,56 @@ class MainWindow(MainFrame):
         MainFrame.__init__(self, None, dpi=(self.dpiY, self.dpiY))
         self.trayIcon = TrayIcon(self)
         self.aboutDialog = AboutDialog(self, dpi=(self.dpiY, self.dpiY))
-
+        self.editDialog = EditDialog(self, dpi=(self.dpiY, self.dpiY))
         self.InitMainWindow()
-        root = self.hostsTree.AddRoot("全部Hosts")
-        for hosts in self.hostsList:
-            self.hostsTree.AppendItem(root, hosts.title)
-        self.hostsTree.ExpandAll()
-        # for hosts in self.hostsList:
-        #     self.hostsListView.Append(hosts.title)
+        self.InitHostsTree(ID_SYSTEM_HOSTS)
 
-    def Size(self, width, height):
-        return Size(width * self.dpiX, height * self.dpiY)
+    def InitHostsTree(self, select=None):
+        self.hostsTree.DeleteAllItems()
+        root = self.hostsTree.AddRoot("全部Hosts")
+        selectId = self.hostsTree.AppendItem(root, "当前系统", data=systemHosts)
+        for hosts in Settings.settings["hosts"]:
+            itemId = self.hostsTree.AppendItem(root, hosts["name"], data=hosts)
+            if hosts["id"] == select:
+                selectId = itemId
+        self.hostsTree.ExpandAll()
+        if selectId:
+            self.hostsTree.SelectItem(selectId)
 
     def InitMainWindow(self):
         self.Show()
-        self.codeEditor.SetText(Hosts.GetSystemHosts())
+        self.codeEditor.SetValue(Hosts.GetSystemHosts())
+        self.codeEditor.SetReadOnly(True)
         self.Bind(EVT_CLOSE, self.OnWindowClose)
-        self.statusBar.SetFieldsCount(2)
-        self.SetStatusWidths([-1, -3])
-        self.statusBar.SetStatusText("当前共%d个Hosts规则" % len(self.hostsList), 0)
-        self.hostsTree.Bind(EVT_TREE_ITEM_ACTIVATED, self.OnHostTreeItemClicked)
+        self.statusBar.SetFieldsCount(3)
+        self.SetStatusWidths([-1, -2, -1])
+        self.statusBar.SetStatusText("当前共%d个Hosts规则" % len(Settings.settings["hosts"]), 0)
+        self.hostsTree.Bind(EVT_TREE_SEL_CHANGED, self.OnHostsTreeItemSelect)
+        self.hostsTree.Bind(EVT_TREE_ITEM_RIGHT_CLICK, self.ShowTreeItemMenu)
 
-    def OnHostTreeItemClicked(self, event):
-        event.Skip()
+    def ShowTreeItemMenu(self, event):
+        hosts = self.hostsTree.GetItemData(event.GetItem())
+        menu = Menu()
+        menu.Append(ID_ANY, "设置为当前Hosts").Enable(hosts["active"])
+        menu.AppendSeparator()
+        menu.Append(ID_ANY, "编辑").Enable(hosts["id"] != ID_SYSTEM_HOSTS)
+        menu.Append(ID_ANY, "删除").Enable(hosts["id"] != ID_SYSTEM_HOSTS)
+        menu.Append(ID_ANY, "刷新")
+        self.hostsTree.PopupMenu(menu, event.GetPoint())
+
+    def ShowHostsInEditor(self, event):
+        pass
+
+    def OnHostsTreeItemSelect(self, event):
+        hosts = self.hostsTree.GetItemData(event.GetItem())
+        if not hosts:
+            return
+        self.codeEditor.SetValue(Hosts.GetSystemHosts() if hosts["id"] == ID_SYSTEM_HOSTS else hosts["content"])
+        self.codeEditor.SetReadOnly(hosts["readOnly"])
 
     def OnCodeEditorKeyUp(self, event):
         if event.cmdDown and event.KeyCode == 83:
-            try:
-                with open(Hosts.GetHostsPath(), mode="w") as file:
-                    if file.write(self.codeEditor.GetText()) > 0:
-                        MessageBox(u"保存成功")
-                    else:
-                        MessageBox(u"保存失败")
-            except PermissionError:
-                MessageBox(r"没有修改%s的权限" % Hosts.GetHostsPath(), u"保存失败", OK | ICON_ERROR, self)
-            except:
-                MessageBox(traceback.format_exc(), u"保存失败", OK | ICON_ERROR, self)
+            pass
 
     def ToggleWindow(self):
         self.Show(not self.IsShown())
@@ -81,19 +92,40 @@ class MainWindow(MainFrame):
     def ShowAboutDialog(self):
         self.aboutDialog.Show(True)
 
-    def OnHostsMenuClicked(self, event):
-        for hosts in self.hostsList:
-            hosts.SetActive(hosts.GetId() == event.GetId())
+    def OnTaskBarHostsMenuClicked(self, event):
+        commonHostsContent = ""
+        currentHostsContent = ""
+        currentHosts = None
+
+        for hosts in Settings.settings["hosts"]:
+            if hosts["id"] == event.GetId():
+                currentHostsContent = hosts["content"]
+                currentHosts = hosts
+            if hosts["alwaysApply"]:
+                commonHostsContent += hosts["content"]
+            else:
+                hosts["active"] = hosts["id"] == event.GetId()
+
+        if Hosts.Save2System(commonHostsContent + "\n" + currentHostsContent):
+            Hosts.TryFlushDNSCache()
+            MessageBox("Hosts已设置为" + currentHosts["name"], "保存成功", ICON_NONE)
+        else:
+            MessageBox("保存失败", "提示", ICON_ERROR)
+
+    def ShowEditDialog(self):
+        self.editDialog.Show()
+        pass
 
     def OnMenuClicked(self, event):
         handlers = {
             self.menuItemExit.GetId(): self.Exit,
             self.menuItemAbout.GetId(): self.ShowAboutDialog,
             self.menuItemHelpDoc.GetId(): lambda: LaunchDefaultBrowser("https://hefang.link/url/mhosts-doc"),
+            self.menuItemNew.GetId(): self.ShowEditDialog,
             TrayIcon.ID_EXIT: self.Exit,
             TrayIcon.ID_TOGGLE: self.ToggleWindow,
             TrayIcon.ID_REFRESH_DNS: MainWindow.DoRefreshDNS,
-            TrayIcon.ID_NEW: None,
+            TrayIcon.ID_NEW: self.ShowEditDialog,
             TrayIcon.ID_IMPORT: None,
             TrayIcon.ID_LUNCH_CHROME: lambda: MainWindow.LunchChrome(),
             TrayIcon.ID_LUNCH_CHROME_CROS: lambda: MainWindow.LunchChrome(
@@ -137,9 +169,10 @@ class MainWindow(MainFrame):
 
     def MainLoop(self):
         self.app.MainLoop()
+        Settings.Save()
 
     @staticmethod
     def PrintSysInfo():
-        print("版本：", version)
+        print("版本：", Settings.version())
         print("系统：", sys.platform)
         print("hosts:", Hosts.GetHostsPath())

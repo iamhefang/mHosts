@@ -4,10 +4,11 @@ from wx import Frame, DEFAULT_FRAME_STYLE, SYSTEM_MENU, TAB_TRAVERSAL, MenuBar, 
     STB_SIZEGRIP, Font, FONTFAMILY_DEFAULT, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL, \
     EmptyString, HORIZONTAL, TreeCtrl, Point, TR_DEFAULT_STYLE, EVT_MENU, Dialog, ID_ANY, DefaultPosition, \
     DEFAULT_DIALOG_STYLE, \
-    Size, DefaultSize, Icon, BITMAP_TYPE_ICO, BoxSizer, VERTICAL, EXPAND, BOTH
+    Size, DefaultSize, Icon, BITMAP_TYPE_ICO, BoxSizer, VERTICAL, EXPAND, BOTH, FLEX_GROWMODE_SPECIFIED, FlexGridSizer, \
+    RadioButton, StaticText, TextCtrl, Button, ALL, EVT_RADIOBUTTON, EVT_BUTTON, MessageBox, ICON_WARNING, Now
 
 from helpers import iconPath
-from version import version
+from settings import Settings, hostsDict
 from views.CodeView import CodeView
 from views.HtmlView import HtmlView
 
@@ -15,13 +16,13 @@ from views.HtmlView import HtmlView
 class MainFrame(Frame):
 
     def __init__(self, parent, dpi=(1, 1)):
-        Frame.__init__(self, parent, id=ID_ANY, title=u" mHosts - v" + version,
-                       pos=DefaultPosition,
-                       size=Size(700 * dpi[0], 500 * dpi[1]),
-                       style=DEFAULT_FRAME_STYLE | SYSTEM_MENU | TAB_TRAVERSAL)
+        Frame.__init__(
+            self, parent, id=ID_ANY, title=u" mHosts - v" + Settings.version(),
+            pos=DefaultPosition,
+            size=Size(700 * dpi[0], 500 * dpi[1]),
+            style=DEFAULT_FRAME_STYLE | SYSTEM_MENU | TAB_TRAVERSAL
+        )
         self.SetIcon(Icon(iconPath, BITMAP_TYPE_ICO))
-        # self.SetSize(Size(size[0] / 2, size[1] / 1.5))
-        # self.SetSizeHints(Size(size[0] / 3, size[1] / 2.5), DefaultSize)
 
         self.menuBar = MenuBar(0)
         self.menuFile = Menu()
@@ -110,7 +111,7 @@ class AboutDialog(Dialog):
         Dialog.__init__(
             self, parent,
             id=ID_ANY,
-            title=u" 关于 mHosts - v%s" % version,
+            title=u" 关于 mHosts - v%s" % Settings.version(),
             pos=DefaultPosition,
             style=DEFAULT_DIALOG_STYLE,
             size=Size(500 * dpi[0], 400 * dpi[1])
@@ -131,3 +132,110 @@ class AboutDialog(Dialog):
 
     def __del__(self):
         pass
+
+
+class EditDialog(Dialog):
+    __hosts = None
+    __window = None
+
+    def __init__(self, parent, dpi=(1, 1), hosts=None):
+        Dialog.__init__(
+            self, parent,
+            id=ID_ANY,
+            title=u"编辑/添加Hosts",
+            pos=DefaultPosition,
+            size=Size(394 * dpi[0], 191 * dpi[1]),
+            style=DEFAULT_DIALOG_STYLE
+        )
+        self.__window = parent
+        self.__hosts = hosts
+        self.SetSizeHints(DefaultSize, DefaultSize)
+
+        fgSizer3 = FlexGridSizer(0, 2, 0, 0)
+        fgSizer3.SetFlexibleDirection(BOTH)
+        fgSizer3.SetNonFlexibleGrowMode(FLEX_GROWMODE_SPECIFIED)
+
+        self.localRadio = RadioButton(self, ID_ANY, u"本地Hosts", DefaultPosition, DefaultSize, 0)
+        fgSizer3.Add(self.localRadio, 0, ALL, 5)
+        self.localRadio.Bind(EVT_RADIOBUTTON, self.OnRadioChange)
+
+        self.onlineRadio = RadioButton(self, ID_ANY, u"在线Hosts", DefaultPosition, DefaultSize, 0)
+        fgSizer3.Add(self.onlineRadio, 0, ALL, 5)
+        self.onlineRadio.Bind(EVT_RADIOBUTTON, self.OnRadioChange)
+
+        self.m_staticText4 = StaticText(self, ID_ANY, u"名称", DefaultPosition, DefaultSize, 0)
+        self.m_staticText4.Wrap(-1)
+
+        fgSizer3.Add(self.m_staticText4, 0, ALL, 5)
+
+        self.nameInput = TextCtrl(self, ID_ANY, EmptyString, DefaultPosition, Size(260, -1), 0)
+        fgSizer3.Add(self.nameInput, 0, ALL, 5)
+
+        self.m_staticText5 = StaticText(self, ID_ANY, u"地址", DefaultPosition, DefaultSize, 0)
+        self.m_staticText5.Wrap(-1)
+
+        fgSizer3.Add(self.m_staticText5, 0, ALL, 5)
+
+        self.urlInput = TextCtrl(self, ID_ANY, u"http://", DefaultPosition, Size(260, -1), 0)
+        fgSizer3.Add(self.urlInput, 0, ALL, 5)
+
+        self.cancelButton = Button(self, ID_ANY, u"取消", DefaultPosition, DefaultSize, 0)
+        fgSizer3.Add(self.cancelButton, 0, ALL, 5)
+
+        self.saveButton = Button(self, ID_ANY, u"保存", DefaultPosition, DefaultSize, 0)
+        fgSizer3.Add(self.saveButton, 0, ALL, 5)
+
+        self.SetSizer(fgSizer3)
+        self.Layout()
+
+        self.Centre(BOTH)
+
+        if hosts:
+            self.onlineRadio.SetValue(hosts["url"] and len(hosts["url"] > 0))
+            self.localRadio.SetValue(not hosts["url"])
+            self.nameInput.SetValue(hosts["name"])
+            self.urlInput.SetValue(hosts["url"] or "")
+            self.onlineRadio.Enable(False)
+            self.localRadio.Enable(False)
+
+        self.cancelButton.Bind(EVT_BUTTON, self.OnButtonClicked)
+        self.saveButton.Bind(EVT_BUTTON, self.OnButtonClicked)
+
+    def __del__(self):
+        pass
+
+    def OnButtonClicked(self, event):
+        if event.GetId() == self.cancelButton.GetId():
+            self.Close()
+            return
+        name = self.nameInput.GetValue()
+        url = self.urlInput.GetValue()
+        isOnline = self.onlineRadio.GetValue()
+        if not isOnline:
+            url = None
+        if not name or len(name) < 1:
+            MessageBox("请输入Hosts名称", "提示", ICON_WARNING)
+        elif isOnline and (not url or len(url) < 1):
+            MessageBox("请输入在线Hosts地址", "提示", ICON_WARNING)
+        else:
+            hostsId = None
+            if self.__hosts:
+                self.__hosts["name"] = name
+                self.__hosts["url"] = url
+                self.__hosts["lastUpdateTime"] = Now()
+                hostsId = self.__hosts['id']
+            else:
+                hostsId = 0x1994 + len(Settings.settings["hosts"])
+                Settings.settings["hosts"].append(hostsDict(
+                    hostsId,
+                    name,
+                    url=url,
+                    lastUpdateTime=Now(),
+                    content="# Created by mHosts v%s, %s\n" % (Settings.version(), Now())
+                ))
+            Settings.Save()
+            self.__window.InitHostsTree(select=hostsId)
+            self.Close()
+
+    def OnRadioChange(self, event):
+        self.urlInput.Enable(event.GetId() == self.onlineRadio.GetId())

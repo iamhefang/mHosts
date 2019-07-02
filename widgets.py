@@ -152,11 +152,15 @@ class EditDialog(Dialog):
         self.__hosts = hosts
         self.SetSizeHints(DefaultSize, DefaultSize)
 
+        font = Font(12, FONTFAMILY_DEFAULT, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL, False, EmptyString)
+        inputSize = Size(260 * dpi[0], -1)
+        self.SetFont(font)
         fgSizer3 = FlexGridSizer(0, 2, 0, 0)
         fgSizer3.SetFlexibleDirection(BOTH)
         fgSizer3.SetNonFlexibleGrowMode(FLEX_GROWMODE_SPECIFIED)
 
         self.localRadio = RadioButton(self, ID_ANY, u"本地Hosts", DefaultPosition, DefaultSize, 0)
+        self.localRadio.SetFont(font)
         fgSizer3.Add(self.localRadio, 0, ALL, 5)
         self.localRadio.Bind(EVT_RADIOBUTTON, self.OnRadioChange)
 
@@ -169,7 +173,7 @@ class EditDialog(Dialog):
 
         fgSizer3.Add(self.m_staticText4, 0, ALL, 5)
 
-        self.nameInput = TextCtrl(self, ID_ANY, EmptyString, DefaultPosition, Size(260, -1), 0)
+        self.nameInput = TextCtrl(self, ID_ANY, EmptyString, DefaultPosition, inputSize, 0)
         fgSizer3.Add(self.nameInput, 0, ALL, 5)
 
         self.m_staticText5 = StaticText(self, ID_ANY, u"地址", DefaultPosition, DefaultSize, 0)
@@ -177,7 +181,7 @@ class EditDialog(Dialog):
 
         fgSizer3.Add(self.m_staticText5, 0, ALL, 5)
 
-        self.urlInput = TextCtrl(self, ID_ANY, u"http://", DefaultPosition, Size(260, -1), 0)
+        self.urlInput = TextCtrl(self, ID_ANY, u"http://", DefaultPosition, inputSize, 0)
         fgSizer3.Add(self.urlInput, 0, ALL, 5)
 
         self.m_staticText3 = StaticText(self, ID_ANY, u"图标", DefaultPosition, DefaultSize, 0)
@@ -185,9 +189,10 @@ class EditDialog(Dialog):
 
         fgSizer3.Add(self.m_staticText3, 0, ALL, 5)
 
-        self.m_comboBox1 = ComboBox(self, ID_ANY, u"图标!", DefaultPosition, Size(260, -1), [
-            "红", "绿", "蓝"
+        self.m_comboBox1 = ComboBox(self, ID_ANY, u"请选择图标", DefaultPosition, inputSize, [
+            "红", "橙", "黄", "绿", "蓝", "蓝", "靛", "紫"
         ], 0)
+        self.m_comboBox1.SetFont(font)
         fgSizer3.Add(self.m_comboBox1, 0, ALL, 5)
 
         self.cancelButton = Button(self, ID_ANY, u"取消", DefaultPosition, DefaultSize, 0)

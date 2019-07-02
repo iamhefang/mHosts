@@ -7,7 +7,6 @@ from settings import Settings
 class HtmlView(HtmlWindow):
     def __init__(self, parent, size):
         HtmlWindow.__init__(self, parent, ID_ANY, DefaultPosition, size=size, style=html.HW_SCROLLBAR_AUTO)
-        # self.SetSize(Size(400, 300))
         self.SetPage("""
 <!doctype html>
 <html lang="zh">

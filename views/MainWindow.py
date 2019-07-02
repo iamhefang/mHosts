@@ -5,15 +5,12 @@ from wx import App, MessageBox, ICON_ERROR, OK, ICON_NONE, EVT_CLOSE, LaunchDefa
     EVT_TREE_SEL_CHANGED, EVT_TREE_ITEM_RIGHT_CLICK, Menu, ID_ANY
 
 import Hosts
+from CheckNewVersionThread import CheckNewVersionThread
 from settings import Settings, systemHosts, ID_SYSTEM_HOSTS
 from views.TrayIcon import TrayIcon
 from widgets import MainFrame, AboutDialog, EditDialog
 
 
-# import traceback
-
-
-# noinspection PyPep8Naming
 class MainWindow(MainFrame):
     app = App()
     size = DisplaySize()
@@ -53,6 +50,7 @@ class MainWindow(MainFrame):
         self.statusBar.SetStatusText("当前共%d个Hosts规则" % len(Settings.settings["hosts"]), 0)
         self.hostsTree.Bind(EVT_TREE_SEL_CHANGED, self.OnHostsTreeItemSelect)
         self.hostsTree.Bind(EVT_TREE_ITEM_RIGHT_CLICK, self.ShowTreeItemMenu)
+        self.CheckUpdate()
 
     def ShowTreeItemMenu(self, event):
         hosts = self.hostsTree.GetItemData(event.GetItem())
@@ -122,6 +120,7 @@ class MainWindow(MainFrame):
             self.menuItemAbout.GetId(): self.ShowAboutDialog,
             self.menuItemHelpDoc.GetId(): lambda: LaunchDefaultBrowser("https://hefang.link/url/mhosts-doc"),
             self.menuItemNew.GetId(): self.ShowEditDialog,
+            self.menuItemCheckUpdate.GetId(): self.CheckUpdate,
             TrayIcon.ID_EXIT: self.Exit,
             TrayIcon.ID_TOGGLE: self.ToggleWindow,
             TrayIcon.ID_REFRESH_DNS: MainWindow.DoRefreshDNS,
@@ -143,6 +142,9 @@ class MainWindow(MainFrame):
                 print("该菜单绑定的事件不可用")
         else:
             print("该菜单没有绑定事件")
+
+    def CheckUpdate(self):
+        CheckNewVersionThread(self).start()
 
     @staticmethod
     def LunchChrome(args=""):

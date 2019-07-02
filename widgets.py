@@ -5,7 +5,7 @@ from wx import Frame, DEFAULT_FRAME_STYLE, SYSTEM_MENU, TAB_TRAVERSAL, MenuBar, 
     EmptyString, HORIZONTAL, TreeCtrl, Point, TR_DEFAULT_STYLE, EVT_MENU, Dialog, ID_ANY, DefaultPosition, \
     DEFAULT_DIALOG_STYLE, \
     Size, DefaultSize, Icon, BITMAP_TYPE_ICO, BoxSizer, VERTICAL, EXPAND, BOTH, FLEX_GROWMODE_SPECIFIED, FlexGridSizer, \
-    RadioButton, StaticText, TextCtrl, Button, ALL, EVT_RADIOBUTTON, EVT_BUTTON, MessageBox, ICON_WARNING, Now
+    RadioButton, StaticText, TextCtrl, Button, ALL, EVT_RADIOBUTTON, EVT_BUTTON, MessageBox, ICON_WARNING, Now, ComboBox
 
 from helpers import iconPath
 from settings import Settings, hostsDict
@@ -23,7 +23,7 @@ class MainFrame(Frame):
             style=DEFAULT_FRAME_STYLE | SYSTEM_MENU | TAB_TRAVERSAL
         )
         self.SetIcon(Icon(iconPath, BITMAP_TYPE_ICO))
-
+        self.SetSizeHints(Size(500 * dpi[0], 350 * dpi[1]))
         self.menuBar = MenuBar(0)
         self.menuFile = Menu()
         self.menuItemNew = MenuItem(self.menuFile, ID_ANY, u"新建(&N)", EmptyString, ITEM_NORMAL)
@@ -92,6 +92,7 @@ class MainFrame(Frame):
         self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemHelpDoc.GetId())
         self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemSettings.GetId())
         self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemImport.GetId())
+        self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemCheckUpdate.GetId())
 
     def __del__(self):
         pass
@@ -144,7 +145,7 @@ class EditDialog(Dialog):
             id=ID_ANY,
             title=u"编辑/添加Hosts",
             pos=DefaultPosition,
-            size=Size(394 * dpi[0], 191 * dpi[1]),
+            size=Size(394 * dpi[0], 210 * dpi[1]),
             style=DEFAULT_DIALOG_STYLE
         )
         self.__window = parent
@@ -178,6 +179,16 @@ class EditDialog(Dialog):
 
         self.urlInput = TextCtrl(self, ID_ANY, u"http://", DefaultPosition, Size(260, -1), 0)
         fgSizer3.Add(self.urlInput, 0, ALL, 5)
+
+        self.m_staticText3 = StaticText(self, ID_ANY, u"图标", DefaultPosition, DefaultSize, 0)
+        self.m_staticText3.Wrap(-1)
+
+        fgSizer3.Add(self.m_staticText3, 0, ALL, 5)
+
+        self.m_comboBox1 = ComboBox(self, ID_ANY, u"图标!", DefaultPosition, Size(260, -1), [
+            "红", "绿", "蓝"
+        ], 0)
+        fgSizer3.Add(self.m_comboBox1, 0, ALL, 5)
 
         self.cancelButton = Button(self, ID_ANY, u"取消", DefaultPosition, DefaultSize, 0)
         fgSizer3.Add(self.cancelButton, 0, ALL, 5)
@@ -218,7 +229,6 @@ class EditDialog(Dialog):
         elif isOnline and (not url or len(url) < 1):
             MessageBox("请输入在线Hosts地址", "提示", ICON_WARNING)
         else:
-            hostsId = None
             if self.__hosts:
                 self.__hosts["name"] = name
                 self.__hosts["url"] = url

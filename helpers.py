@@ -1,6 +1,8 @@
 # _*_ coding: utf-8 _*_
+import json
 import os
 import sys
+from urllib import request
 
 
 def ResPath(path):
@@ -11,7 +13,9 @@ iconPath = ResPath("icons/logo.ico")
 
 
 def FetchNewVersion():
-    pass
+    url = "https://raw.githubusercontent.com/iamhefang/mHosts/master/mHosts.json"
+    info = json.loads(request.urlopen(url).read().decode('utf-8'), encoding="utf-8")
+    return info['version']
 
 
 def HasPermission(path):

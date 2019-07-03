@@ -4,18 +4,35 @@ import os
 import sys
 from urllib import request
 
+from wx import BITMAP_TYPE_PNG, Bitmap
+
+__ResPathCache = {}
+__iconCache = {}
+
 
 def ResPath(path):
-    return os.path.join(getattr(sys, '_MEIPASS', os.getcwd()), path)
+    if path not in __ResPathCache:
+        __ResPathCache[path] = os.path.join(getattr(sys, '_MEIPASS', os.getcwd()), path.replace("/", os.sep))
+    return __ResPathCache[path]
 
 
 iconPath = ResPath("icons/logo.ico")
 
 
+def GetIcons() -> dict:
+    if not __iconCache:
+        iconsPath = ResPath("icons")
+        files = os.listdir(iconsPath)
+        for file in files:
+            if file.endswith(".png"):
+                __iconCache[file.split(".")[0]] = Bitmap("icons/%s" % file, BITMAP_TYPE_PNG)
+    return __iconCache
+
+
 def FetchNewVersion():
     url = "https://raw.githubusercontent.com/iamhefang/mHosts/master/mHosts.json"
-    info = json.loads(request.urlopen(url).read().decode('utf-8'), encoding="utf-8")
-    return info['version']
+    info = json.loads(request.urlopen(url, timeout=10).read().decode('utf-8'), encoding="utf-8")
+    return info
 
 
 def HasPermission(path):

@@ -10,12 +10,13 @@ settingPath = "settings.json"
 
 
 def hostsDict(
-        hostId, name,
+        hostId, name, icon="logo",
         readOnly=False, alwaysApply=False,
         url=None, lastUpdateTime=None,
         active=False, content=""):
     """
     封装Hosts字典
+    :param icon: 图标名称, icons目录下以.png结尾的文件的文件名
     :param hostId: hosts Id
     :param name: 名称
     :param readOnly: 是否只读
@@ -34,7 +35,8 @@ def hostsDict(
         "url": url,
         "lastUpdateTime": lastUpdateTime,
         "active": active,
-        "content": content
+        "content": content,
+        "icon": icon
     }
 
 
@@ -64,7 +66,7 @@ class Settings:
     settings = None
 
     @staticmethod
-    def version():
+    def version() -> str:
         if not Settings.__version:
             with open(ResPath("mHosts.json"), mode="r") as file:
                 info = json.load(file)

@@ -1,7 +1,7 @@
-from wx import MenuItem, Icon, BITMAP_TYPE_ICO, Menu, EVT_MENU, NewId, adv, ITEM_CHECK, ID_ANY
+from wx import MenuItem, Icon, BITMAP_TYPE_ICO, Menu, EVT_MENU, NewId, adv, ITEM_CHECK, ID_ANY, Bitmap, BITMAP_TYPE_PNG
 from wx.adv import TaskBarIcon
 
-from helpers import iconPath
+from helpers import iconPath, ResPath
 from settings import Settings
 
 
@@ -20,6 +20,10 @@ class TrayIcon(TaskBarIcon):
     ID_LUNCH_CHROME_CROS = NewId()
     # 禁用插件
     ID_LUNCH_CHROME_NO_PLUGINS = NewId()
+    ID_TREE_MENU_DELETE = NewId()
+    ID_TREE_MENU_EDIT = NewId()
+    ID_TREE_MENU_REFRESH = NewId()
+    ID_TREE_MENU_SET_ACTIVE = NewId()
 
     __window = None
     menu = None
@@ -45,7 +49,9 @@ class TrayIcon(TaskBarIcon):
 
     def CreatePopupMenu(self):
         menu = Menu()
-        menu.Append(ID_ANY, "mHosts v" + Settings.version()).Enable(False)
+        appMenuItem = menu.Append(ID_ANY, "mHosts v" + Settings.version())
+        appMenuItem.Enable(False)
+        appMenuItem.SetBitmap(Bitmap(ResPath("icons/logo.png"), BITMAP_TYPE_PNG))
         menu.Append(self.ID_TOGGLE, r"%s主窗口" % ("隐藏" if self.__window.IsShown() else "显示"))
         menu.AppendSeparator()
         for hosts in Settings.settings["hosts"]:

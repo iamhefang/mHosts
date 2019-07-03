@@ -5,9 +5,11 @@ from wx import Frame, DEFAULT_FRAME_STYLE, SYSTEM_MENU, TAB_TRAVERSAL, MenuBar, 
     EmptyString, HORIZONTAL, TreeCtrl, Point, TR_DEFAULT_STYLE, EVT_MENU, Dialog, ID_ANY, DefaultPosition, \
     DEFAULT_DIALOG_STYLE, \
     Size, DefaultSize, Icon, BITMAP_TYPE_ICO, BoxSizer, VERTICAL, EXPAND, BOTH, FLEX_GROWMODE_SPECIFIED, FlexGridSizer, \
-    RadioButton, StaticText, TextCtrl, Button, ALL, EVT_RADIOBUTTON, EVT_BUTTON, MessageBox, ICON_WARNING, Now, ComboBox
+    RadioButton, StaticText, TextCtrl, Button, ALL, EVT_RADIOBUTTON, EVT_BUTTON, MessageBox, ICON_WARNING, Now, \
+    ComboBox, \
+    ImageList
 
-from helpers import iconPath
+from helpers import iconPath, GetIcons
 from settings import Settings, hostsDict
 from views.CodeView import CodeView
 from views.HtmlView import HtmlView
@@ -57,13 +59,18 @@ class MainFrame(Frame):
         self.SetMenuBar(self.menuBar)
 
         self.statusBar = StatusBar(self, ID_ANY, STB_SIZEGRIP)
-        statusBarFont = Font(10, FONTFAMILY_DEFAULT, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL, False,
-                             EmptyString)
+        statusBarFont = Font(10, FONTFAMILY_DEFAULT, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL, False, EmptyString)
         self.statusBar.SetFont(statusBarFont)
         self.SetStatusBar(self.statusBar)
 
-        # self.statusBar = self.CreateStatusBar(1, STB_SIZEGRIP, ID_ANY)
         bSizer1 = BoxSizer(HORIZONTAL)
+
+        self.images = {}
+
+        self.imageList = ImageList(width=12, height=12)
+
+        for name, bitmap in GetIcons().items():
+            self.images[name] = self.imageList.Add(bitmap)
 
         self.hostsTree = TreeCtrl(
             self, ID_ANY,
@@ -71,6 +78,7 @@ class MainFrame(Frame):
             Size(180 * dpi[0], -1),
             TR_DEFAULT_STYLE
         )
+        self.hostsTree.SetImageList(self.imageList)
         bSizer1.Add(self.hostsTree, 0, EXPAND, 5)
 
         # self.hostsListView = CheckListBox(self, size=Size(size[0] / 9, -1))
@@ -96,6 +104,10 @@ class MainFrame(Frame):
 
     def __del__(self):
         pass
+
+    def Destroy(self):
+        self.imageList.Destroy()
+        Frame.Destroy(self)
 
     # Virtual event handlers, overide them in your derived class
     def OnMenuClicked(self, event):

@@ -2,7 +2,7 @@ import os
 import sys
 
 from wx import App, MessageBox, ICON_ERROR, OK, ICON_NONE, EVT_CLOSE, LaunchDefaultBrowser, DisplaySize, \
-    EVT_TREE_SEL_CHANGED, EVT_TREE_ITEM_RIGHT_CLICK, Menu, ID_ANY
+    EVT_TREE_SEL_CHANGED, EVT_TREE_ITEM_RIGHT_CLICK, Menu, EVT_MENU
 
 import Hosts
 from CheckNewVersionThread import CheckNewVersionThread
@@ -30,13 +30,15 @@ class MainWindow(MainFrame):
 
     def InitHostsTree(self, select=None):
         self.hostsTree.DeleteAllItems()
-        root = self.hostsTree.AddRoot("全部Hosts")
-        selectId = self.hostsTree.AppendItem(root, "当前系统", data=systemHosts)
+        root = self.hostsTree.AddRoot("全部Hosts", image=self.images["logo"])
+        selectId = self.hostsTree.AppendItem(root, "当前系统", image=self.images[sys.platform], data=systemHosts)
+
         for hosts in Settings.settings["hosts"]:
-            itemId = self.hostsTree.AppendItem(root, hosts["name"], data=hosts)
+            itemId = self.hostsTree.AppendItem(root, hosts["name"], data=hosts, image=self.images[hosts["icon"]])
             if hosts["id"] == select:
                 selectId = itemId
         self.hostsTree.ExpandAll()
+
         if selectId:
             self.hostsTree.SelectItem(selectId)
 
@@ -54,13 +56,21 @@ class MainWindow(MainFrame):
 
     def ShowTreeItemMenu(self, event):
         hosts = self.hostsTree.GetItemData(event.GetItem())
+        if not hosts:
+            return
         menu = Menu()
-        menu.Append(ID_ANY, "设置为当前Hosts").Enable(hosts["active"])
+        print(not hosts["active"] or not hosts["alwaysApply"] or hosts["id"] != ID_SYSTEM_HOSTS)
+        setToCurrent = menu.Append(TrayIcon.ID_TREE_MENU_SET_ACTIVE, "设置为当前Hosts")
+        if hosts["id"] == ID_SYSTEM_HOSTS or hosts['alwaysApply']:
+            setToCurrent.Enable(False)
+        else:
+            setToCurrent.Enable(not hosts["active"])
         menu.AppendSeparator()
-        menu.Append(ID_ANY, "编辑").Enable(hosts["id"] != ID_SYSTEM_HOSTS)
-        menu.Append(ID_ANY, "删除").Enable(hosts["id"] != ID_SYSTEM_HOSTS)
-        menu.Append(ID_ANY, "刷新")
+        menu.Append(TrayIcon.ID_TREE_MENU_EDIT, "编辑").Enable(hosts["id"] != ID_SYSTEM_HOSTS)
+        menu.Append(TrayIcon.ID_TREE_MENU_DELETE, "删除").Enable(hosts["id"] != ID_SYSTEM_HOSTS)
+        menu.Append(TrayIcon.ID_TREE_MENU_REFRESH, "刷新")
         self.hostsTree.PopupMenu(menu, event.GetPoint())
+        self.hostsTree.Bind(EVT_MENU, self.OnMenuClicked)
 
     def ShowHostsInEditor(self, event):
         pass
@@ -162,6 +172,8 @@ class MainWindow(MainFrame):
         MessageBox(u"刷新DNS成功", u"提示", OK | ICON_NONE)
 
     def Exit(self):
+        # for thread in CheckNewVersionThread.pool:
+        #     thread.join()
         self.trayIcon.Destroy()
         self.aboutDialog.Close()
         self.aboutDialog.Destroy()

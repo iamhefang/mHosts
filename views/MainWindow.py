@@ -2,7 +2,7 @@ import os
 import sys
 
 from wx import App, MessageBox, ICON_ERROR, OK, ICON_NONE, EVT_CLOSE, LaunchDefaultBrowser, DisplaySize, \
-    EVT_TREE_SEL_CHANGED, EVT_TREE_ITEM_RIGHT_CLICK, Menu, EVT_MENU
+    EVT_TREE_SEL_CHANGED, EVT_TREE_ITEM_RIGHT_CLICK, Menu, EVT_MENU, CommandEvent
 
 import Hosts
 from CheckNewVersionThread import CheckNewVersionThread
@@ -16,6 +16,7 @@ class MainWindow(MainFrame):
     size = DisplaySize()
     dpiX = 1
     dpiY = 1
+    __currentHost = None
 
     def __init__(self):
         realSize = DisplaySize()
@@ -58,6 +59,7 @@ class MainWindow(MainFrame):
         hosts = self.hostsTree.GetItemData(event.GetItem())
         if not hosts:
             return
+        self.__currentHost = hosts
         menu = Menu()
         print(not hosts["active"] or not hosts["alwaysApply"] or hosts["id"] != ID_SYSTEM_HOSTS)
         setToCurrent = menu.Append(TrayIcon.ID_TREE_MENU_SET_ACTIVE, "设置为当前Hosts")
@@ -122,9 +124,10 @@ class MainWindow(MainFrame):
 
     def ShowEditDialog(self):
         self.editDialog.Show()
+        self.editDialog.SetHosts(self.__currentHost)
         pass
 
-    def OnMenuClicked(self, event):
+    def OnMenuClicked(self, event: CommandEvent):
         handlers = {
             self.menuItemExit.GetId(): self.Exit,
             self.menuItemAbout.GetId(): self.ShowAboutDialog,
@@ -143,6 +146,7 @@ class MainWindow(MainFrame):
             TrayIcon.ID_LUNCH_CHROME_NO_PLUGINS: lambda: MainWindow.LunchChrome(
                 "--disable-plugins --disable-extensions"
             ),
+            TrayIcon.ID_TREE_MENU_EDIT: lambda: self.ShowEditDialog()
         }
         if event.GetId() in handlers:
             callback = handlers[event.GetId()]

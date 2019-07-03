@@ -151,7 +151,7 @@ class EditDialog(Dialog):
     __hosts = None
     __window = None
 
-    def __init__(self, parent, dpi=(1, 1), hosts=None):
+    def __init__(self, parent, dpi=(1, 1)):
         Dialog.__init__(
             self, parent,
             id=ID_ANY,
@@ -161,10 +161,9 @@ class EditDialog(Dialog):
             style=DEFAULT_DIALOG_STYLE
         )
         self.__window = parent
-        self.__hosts = hosts
         self.SetSizeHints(DefaultSize, DefaultSize)
 
-        font = Font(12, FONTFAMILY_DEFAULT, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL, False, EmptyString)
+        font = Font(10, FONTFAMILY_DEFAULT, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL, False, EmptyString)
         inputSize = Size(260 * dpi[0], -1)
         self.SetFont(font)
         fgSizer3 = FlexGridSizer(0, 2, 0, 0)
@@ -201,11 +200,9 @@ class EditDialog(Dialog):
 
         fgSizer3.Add(self.m_staticText3, 0, ALL, 5)
 
-        self.m_comboBox1 = ComboBox(self, ID_ANY, u"请选择图标", DefaultPosition, inputSize, [
-            "红", "橙", "黄", "绿", "蓝", "蓝", "靛", "紫"
-        ], 0)
-        self.m_comboBox1.SetFont(font)
-        fgSizer3.Add(self.m_comboBox1, 0, ALL, 5)
+        self.iconComboBox = ComboBox(self, ID_ANY, u"请选择图标", DefaultPosition, inputSize, list(GetIcons().keys()), 0)
+        self.iconComboBox.SetFont(font)
+        fgSizer3.Add(self.iconComboBox, 0, ALL, 5)
 
         self.cancelButton = Button(self, ID_ANY, u"取消", DefaultPosition, DefaultSize, 0)
         fgSizer3.Add(self.cancelButton, 0, ALL, 5)
@@ -218,19 +215,24 @@ class EditDialog(Dialog):
 
         self.Centre(BOTH)
 
-        if hosts:
-            self.onlineRadio.SetValue(hosts["url"] and len(hosts["url"] > 0))
-            self.localRadio.SetValue(not hosts["url"])
-            self.nameInput.SetValue(hosts["name"])
-            self.urlInput.SetValue(hosts["url"] or "")
-            self.onlineRadio.Enable(False)
-            self.localRadio.Enable(False)
-
         self.cancelButton.Bind(EVT_BUTTON, self.OnButtonClicked)
         self.saveButton.Bind(EVT_BUTTON, self.OnButtonClicked)
 
     def __del__(self):
         pass
+
+    def SetHosts(self, hosts):
+        self.__hosts = hosts
+
+        if hosts:
+            if hosts["url"] and len(hosts["url"] > 0):
+                self.onlineRadio.SetValue(hosts["url"])
+            self.localRadio.SetValue(not hosts["url"])
+            self.nameInput.SetValue(hosts["name"])
+            self.urlInput.SetValue(hosts["url"] or "")
+            self.iconComboBox.SetValue(hosts["icon"])
+            self.onlineRadio.Enable(False)
+            self.localRadio.Enable(False)
 
     def OnButtonClicked(self, event):
         if event.GetId() == self.cancelButton.GetId():

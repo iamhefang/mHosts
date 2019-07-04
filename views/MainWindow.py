@@ -6,6 +6,7 @@ from wx import App, MessageBox, ICON_ERROR, OK, ICON_NONE, EVT_CLOSE, LaunchDefa
 
 import Hosts
 from CheckNewVersionThread import CheckNewVersionThread
+from helpers import NowToTimestamp
 from settings import Settings, systemHosts, ID_SYSTEM_HOSTS
 from views.TrayIcon import TrayIcon
 from widgets import MainFrame, AboutDialog, EditDialog
@@ -26,6 +27,7 @@ class MainWindow(MainFrame):
         self.trayIcon = TrayIcon(self)
         self.aboutDialog = AboutDialog(self, dpi=(self.dpiY, self.dpiY))
         self.editDialog = EditDialog(self, dpi=(self.dpiY, self.dpiY))
+
         self.InitMainWindow()
         self.InitHostsTree(ID_SYSTEM_HOSTS)
 
@@ -53,7 +55,9 @@ class MainWindow(MainFrame):
         self.statusBar.SetStatusText("当前共%d个Hosts规则" % len(Settings.settings["hosts"]), 0)
         self.hostsTree.Bind(EVT_TREE_SEL_CHANGED, self.OnHostsTreeItemSelect)
         self.hostsTree.Bind(EVT_TREE_ITEM_RIGHT_CLICK, self.ShowTreeItemMenu)
-        self.CheckUpdate()
+        updateTime = Settings.settings["lastCheckUpdateTime"]
+        if updateTime and NowToTimestamp(updateTime) < 0:
+            self.CheckUpdate()
 
     def ShowTreeItemMenu(self, event):
         hosts = self.hostsTree.GetItemData(event.GetItem())
@@ -176,8 +180,6 @@ class MainWindow(MainFrame):
         MessageBox(u"刷新DNS成功", u"提示", OK | ICON_NONE)
 
     def Exit(self):
-        # for thread in CheckNewVersionThread.pool:
-        #     thread.join()
         self.trayIcon.Destroy()
         self.aboutDialog.Close()
         self.aboutDialog.Destroy()

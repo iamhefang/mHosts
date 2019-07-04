@@ -17,12 +17,15 @@ class CodeView(StyledTextCtrl):
         self.SetViewWhiteSpace(False)
         # 行号和内容之间留一定的间距
         self.SetMarginWidth(1, self.TextWidth(STC_STYLE_LINENUMBER, u"_"))
+        # 可编辑
         self.SetReadOnly(False)
+        # 绑定按键事件
         self.Bind(EVT_KEY_UP, self.OnKeyUp)
 
     def OnKeyUp(self, event):
+        # 如果是只读状态, 则忽略按键事件
+        if self.GetReadOnly():
+            return
         # 切换注释
-        if event.controlDown and event.KeyCode == 47:
-            print(event)
-            print(self)
+        if event.controlDown and event.KeyCode == 83:
             pass

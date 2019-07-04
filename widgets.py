@@ -5,11 +5,11 @@ from wx import Frame, DEFAULT_FRAME_STYLE, SYSTEM_MENU, TAB_TRAVERSAL, MenuBar, 
     EmptyString, HORIZONTAL, TreeCtrl, Point, TR_DEFAULT_STYLE, EVT_MENU, Dialog, ID_ANY, DefaultPosition, \
     DEFAULT_DIALOG_STYLE, \
     Size, DefaultSize, Icon, BITMAP_TYPE_ICO, BoxSizer, VERTICAL, EXPAND, BOTH, FLEX_GROWMODE_SPECIFIED, FlexGridSizer, \
-    RadioButton, StaticText, TextCtrl, Button, ALL, EVT_RADIOBUTTON, EVT_BUTTON, MessageBox, ICON_WARNING, Now, \
+    RadioButton, StaticText, TextCtrl, Button, ALL, EVT_RADIOBUTTON, EVT_BUTTON, MessageBox, ICON_WARNING, \
     ComboBox, \
     ImageList
 
-from helpers import iconPath, GetIcons
+from helpers import iconPath, GetIcons, Now
 from settings import Settings, hostsDict
 from views.CodeView import CodeView
 from views.HtmlView import HtmlView
@@ -252,6 +252,7 @@ class EditDialog(Dialog):
                 self.__hosts["name"] = name
                 self.__hosts["url"] = url
                 self.__hosts["lastUpdateTime"] = Now()
+                self.__hosts["icon"] = self.iconComboBox.GetValue()
                 hostsId = self.__hosts['id']
             else:
                 hostsId = 0x1994 + len(Settings.settings["hosts"])

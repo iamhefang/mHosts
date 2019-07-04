@@ -1,10 +1,8 @@
 import json
 import os
 
-from wx import Now
-
 import Hosts
-from helpers import WriteText, GetChromePath, ResPath
+from helpers import WriteText, GetChromePath, ResPath, Now
 
 settingPath = "settings.json"
 
@@ -13,7 +11,7 @@ def hostsDict(
         hostId, name, icon="logo",
         readOnly=False, alwaysApply=False,
         url=None, lastUpdateTime=None,
-        active=False, content=""):
+        active=False, content="") -> dict:
     """
     封装Hosts字典
     :param icon: 图标名称, icons目录下以.png结尾的文件的文件名
@@ -25,7 +23,7 @@ def hostsDict(
     :param lastUpdateTime: 在线hosts的上次更新时间, 本地hosts的上次修改时间
     :param active: 是否为当前应用的hosts
     :param content: 内容
-    :return: Dict
+    :return: dict
     """
     return {
         "id": hostId,
@@ -60,10 +58,11 @@ class Settings:
                 "hosts": ["公共", "系统默认"]
             }
         ],
-        "lastSaveTime": Now()
+        "lastSaveTime": Now(),
+        "lastCheckUpdateTime": None
     }
-    __version = None
-    settings = None
+    __version: str = None
+    settings: dict = None
 
     @staticmethod
     def version() -> str:

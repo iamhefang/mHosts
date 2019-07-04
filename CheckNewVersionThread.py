@@ -3,7 +3,7 @@ from threading import Thread, Lock, Event
 
 from wx import MessageBox, ICON_ERROR
 
-from helpers import FetchNewVersion
+from helpers import FetchNewVersion, Now
 from settings import Settings
 
 
@@ -27,6 +27,7 @@ class CheckNewVersionThread(Thread):
             newVersion = LooseVersion(newInfo['version'])
             currentVersion = LooseVersion(Settings.version())
             self.__threadLock.acquire()
+            Settings.settings["lastCheckUpdateTime"] = Now()
             if currentVersion < newVersion:
                 self.__window.statusBar.SetStatusText("检查到新版本" + newVersion.vstring, 2)
             else:

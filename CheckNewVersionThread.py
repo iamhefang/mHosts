@@ -29,7 +29,8 @@ class CheckNewVersionThread(Thread):
             self.__threadLock.acquire()
             Settings.settings["lastCheckUpdateTime"] = Now()
             if currentVersion < newVersion:
-                self.__window.statusBar.SetStatusText("检查到新版本" + newVersion.vstring, 2)
+                MessageBox("当前版本为%s, 检查到新版本%s" % (Settings.version(), newInfo["version"]))
+                self.__window.statusBar.SetStatusText("检查到新版本" + newInfo['version'], 2)
             else:
                 self.__window.statusBar.SetStatusText("当前版本为最新版本", 2)
             self.__threadLock.release()

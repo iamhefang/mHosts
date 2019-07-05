@@ -7,7 +7,7 @@ from wx import Frame, DEFAULT_FRAME_STYLE, SYSTEM_MENU, TAB_TRAVERSAL, MenuBar, 
     Size, DefaultSize, Icon, BITMAP_TYPE_ICO, BoxSizer, VERTICAL, EXPAND, BOTH, FLEX_GROWMODE_SPECIFIED, FlexGridSizer, \
     RadioButton, StaticText, TextCtrl, Button, ALL, EVT_RADIOBUTTON, EVT_BUTTON, MessageBox, ICON_WARNING, \
     ComboBox, \
-    ImageList
+    ImageList, EVT_CLOSE
 
 from helpers import iconPath, GetIcons, Now
 from settings import Settings, hostsDict
@@ -217,13 +217,17 @@ class EditDialog(Dialog):
 
         self.cancelButton.Bind(EVT_BUTTON, self.OnButtonClicked)
         self.saveButton.Bind(EVT_BUTTON, self.OnButtonClicked)
+        self.Bind(EVT_CLOSE, self.OnClose)
 
     def __del__(self):
         pass
 
+    def OnClose(self, event):
+        self.SetHosts(None)
+        event.Skip()
+
     def SetHosts(self, hosts):
         self.__hosts = hosts
-
         if hosts:
             if hosts["url"] and len(hosts["url"] > 0):
                 self.onlineRadio.SetValue(hosts["url"])
@@ -233,6 +237,13 @@ class EditDialog(Dialog):
             self.iconComboBox.SetValue(hosts["icon"])
             self.onlineRadio.Enable(False)
             self.localRadio.Enable(False)
+        else:
+            self.onlineRadio.Enable(False)
+            self.localRadio.Enable(True)
+            self.localRadio.SetValue(True)
+            self.urlInput.SetValue("")
+            self.iconComboBox.SetValue("")
+            self.nameInput.SetValue("")
 
     def OnButtonClicked(self, event):
         if event.GetId() == self.cancelButton.GetId():

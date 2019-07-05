@@ -1,8 +1,10 @@
 from wx import EVT_KEY_UP
-from wx.stc import StyledTextCtrl, STC_MARGIN_NUMBER, STC_STYLE_LINENUMBER, STC_STYLE_DEFAULT
+from wx.stc import StyledTextCtrl, STC_MARGIN_NUMBER, STC_STYLE_LINENUMBER, STC_STYLE_DEFAULT, EVT_STC_CHANGE
 
 
 class CodeView(StyledTextCtrl):
+    __hosts: dict = None
+
     def __init__(self, parent=None):
         StyledTextCtrl.__init__(self, parent)
         # 设置字体
@@ -19,13 +21,17 @@ class CodeView(StyledTextCtrl):
         self.SetMarginWidth(1, self.TextWidth(STC_STYLE_LINENUMBER, u"_"))
         # 可编辑
         self.SetReadOnly(False)
-        # 绑定按键事件
-        self.Bind(EVT_KEY_UP, self.OnKeyUp)
+        self.Bind(EVT_STC_CHANGE, self.OnChange)
+        self.Bind(EVT_KEY_UP, self.OnCodeEditorKeyUp)
 
-    def OnKeyUp(self, event):
-        # 如果是只读状态, 则忽略按键事件
-        if self.GetReadOnly():
-            return
-        # 切换注释
-        if event.controlDown and event.KeyCode == 83:
+    def OnChange(self, event):
+        pass
+
+    def SetHosts(self, hosts: dict):
+        self.__hosts = hosts
+
+    def OnCodeEditorKeyUp(self, event):
+        if event.cmdDown and event.KeyCode == 83:
             pass
+        if self.__hosts:
+            self.__hosts["content"] = self.GetValue()

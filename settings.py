@@ -8,10 +8,15 @@ settingPath = "settings.json"
 
 
 def hostsDict(
-        hostId, name, icon="logo",
-        readOnly=False, alwaysApply=False,
-        url=None, lastUpdateTime=None,
-        active=False, content="") -> dict:
+        hostId,
+        name,
+        icon="logo",
+        readOnly=False,
+        alwaysApply=False,
+        url=None,
+        lastUpdateTime=None,
+        active=False,
+        content="") -> dict:
     """
     封装Hosts字典
     :param icon: 图标名称, icons目录下以.png结尾的文件的文件名

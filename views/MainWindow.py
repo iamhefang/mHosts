@@ -1,5 +1,5 @@
-import os
 import sys
+from subprocess import Popen
 
 from wx import App, MessageBox, ICON_ERROR, OK, ICON_NONE, EVT_CLOSE, LaunchDefaultBrowser, DisplaySize, \
     EVT_TREE_SEL_CHANGED, EVT_TREE_ITEM_RIGHT_CLICK, Menu, EVT_MENU, CommandEvent, Colour, EVT_TREE_ITEM_ACTIVATED
@@ -202,8 +202,7 @@ class MainWindow(MainFrame):
             if ' ' in chromePath:
                 chromePath = '"%s"' % chromePath
             cmd = u'%s %s' % (chromePath, args)
-            print("当前Chrome命令为: " + cmd)
-            os.system(cmd)
+            Popen(cmd)
 
     @staticmethod
     def DoRefreshDNS():

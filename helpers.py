@@ -46,7 +46,7 @@ def GetIcons() -> dict:
         files = os.listdir(iconsPath)
         for file in files:
             if file.endswith(".png"):
-                __iconCache[file.split(".")[0]] = Bitmap("icons/%s" % file, BITMAP_TYPE_PNG)
+                __iconCache[file.split(".")[0]] = Bitmap(ResPath("icons/%s" % file), BITMAP_TYPE_PNG)
     return __iconCache
 
 

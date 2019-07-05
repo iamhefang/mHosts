@@ -3,9 +3,28 @@
 block_cipher = None
 
 datas = [
-    ('.\icons','icons'),
-    ('.\icons\logo.ico','icons'),
-    ('.\mHosts.json','.')
+    (r'.\icons',r'icons'),
+    (r'.\mHosts.json','.'),
+    (r'.\icons\aliyun.png',r'icons'),
+    (r'.\icons\chrome.png',r'icons'),
+    (r'.\icons\common.png',r'icons'),
+    (r'.\icons\database.png',r'icons'),
+    (r'.\icons\edge.png',r'icons'),
+    (r'.\icons\firefox.png',r'icons'),
+    (r'.\icons\java.png',r'icons'),
+    (r'.\icons\linux.png',r'icons'),
+    (r'.\icons\logo.ico',r'icons'),
+    (r'.\icons\logo.png',r'icons'),
+    (r'.\icons\mac.png',r'icons'),
+    (r'.\icons\mysql.png',r'icons'),
+    (r'.\icons\postgresql.png',r'icons'),
+    (r'.\icons\python.png',r'icons'),
+    (r'.\icons\qq.png',r'icons'),
+    (r'.\icons\server.png',r'icons'),
+    (r'.\icons\table.png',r'icons'),
+    (r'.\icons\user.png',r'icons'),
+    (r'.\icons\wechat.png',r'icons'),
+    (r'.\icons\win32.png',r'icons')
 ]
 
 a = Analysis(

@@ -30,6 +30,7 @@ class MainFrame(Frame):
         self.menuFile = Menu()
         self.menuItemNew = MenuItem(self.menuFile, ID_ANY, u"新建(&N)", EmptyString, ITEM_NORMAL)
         self.menuItemImport = MenuItem(self.menuFile, ID_ANY, u"导入(&I)", EmptyString, ITEM_NORMAL)
+        self.menuItemImport.Enable(False)
         self.menuFile.Append(self.menuItemNew)
         self.menuFile.Append(self.menuItemImport)
 
@@ -43,6 +44,7 @@ class MainFrame(Frame):
         self.menuHelp = Menu()
 
         self.menuItemSettings = MenuItem(self.menuHelp, ID_ANY, u"首选项(&P)", EmptyString, ITEM_NORMAL)
+        self.menuItemSettings.Enable(False)
         self.menuHelp.Append(self.menuItemSettings)
 
         self.menuItemHelpDoc = MenuItem(self.menuHelp, ID_ANY, u"帮助文档(&D)", EmptyString, ITEM_NORMAL)

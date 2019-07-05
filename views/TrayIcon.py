@@ -63,7 +63,7 @@ class TrayIcon(TaskBarIcon):
 
         newHostMenu = Menu()
         newHostMenu.Append(self.ID_NEW, "新建")
-        newHostMenu.Append(self.ID_IMPORT, "导入")
+        newHostMenu.Append(self.ID_IMPORT, "导入").Enable(False)
         menu.Append(-1, "新建Hosts方案", newHostMenu)
 
         menu.AppendSeparator()
@@ -76,7 +76,7 @@ class TrayIcon(TaskBarIcon):
             menu.Append(-1, "启动 Google Chrome 浏览器", chromeMenu)
 
         menu.AppendSeparator()
-        menu.Append(self.ID_UPDATE, "更新")
+        menu.Append(self.ID_UPDATE, "更新").Enable(False)
         menu.Append(self.ID_EXIT, "退出")
         self.menu = menu
         return menu

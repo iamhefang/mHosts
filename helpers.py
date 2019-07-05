@@ -65,7 +65,7 @@ def ReadText(file, encoding="utf-8") -> str:
 
 
 def ReadLines(file, encoding="utf-8") -> list:
-    with open(file, mode="r", encoding=encoding) as file:
+    with open(file, mode="r", encoding=encoding, newline="\n") as file:
         return file.readlines()
 
 

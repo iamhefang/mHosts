@@ -150,7 +150,7 @@ class MainWindow(MainFrame):
 
         hostsToApply = commonHostsContent + "\n" + currentHostsContent
 
-        if Hosts.Save2System(hostsToApply.replace("\r\n\r\n", "\r\n")):
+        if Hosts.Save2System(hostsToApply):
             Hosts.TryFlushDNSCache()
             MessageBox("Hosts已设置为" + currentHosts["name"], "保存成功", ICON_NONE)
         else:

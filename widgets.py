@@ -69,7 +69,7 @@ class MainFrame(Frame):
 
         self.images = {}
 
-        self.imageList = ImageList(width=12, height=12)
+        self.imageList = ImageList()
 
         for name, bitmap in GetIcons().items():
             self.images[name] = self.imageList.Add(bitmap)

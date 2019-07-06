@@ -2,7 +2,8 @@ import sys
 from subprocess import Popen
 
 from wx import App, MessageBox, ICON_ERROR, OK, ICON_NONE, EVT_CLOSE, LaunchDefaultBrowser, DisplaySize, \
-    EVT_TREE_SEL_CHANGED, EVT_TREE_ITEM_RIGHT_CLICK, Menu, EVT_MENU, CommandEvent, Colour, EVT_TREE_ITEM_ACTIVATED
+    EVT_TREE_SEL_CHANGED, EVT_TREE_ITEM_RIGHT_CLICK, Menu, EVT_MENU, CommandEvent, Colour, EVT_TREE_ITEM_ACTIVATED, \
+    Locale, LANGUAGE_CHINESE_SIMPLIFIED
 from wx.stc import EVT_STC_CHANGE
 
 import Hosts
@@ -22,6 +23,7 @@ class MainWindow(MainFrame):
     __currentEditHost = None
 
     def __init__(self):
+        self.app.locale = Locale(LANGUAGE_CHINESE_SIMPLIFIED)
         realSize = DisplaySize()
         self.dpiX = realSize[0] / self.size[0]
         self.dpiY = realSize[1] / self.size[1]
@@ -117,10 +119,8 @@ class MainWindow(MainFrame):
         self.codeEditor.SetHosts(hosts)
 
     def ToggleWindow(self):
-        self.Show(not self.IsShown())
         self.Iconize(not self.IsIconized())
-        if self.IsShown():
-            self.Raise()
+        self.Show(not self.IsShown())
 
     def OnWindowClose(self, event):
         self.Iconize(True)
@@ -145,17 +145,22 @@ class MainWindow(MainFrame):
                 currentHosts = hosts
             if hosts["alwaysApply"]:
                 commonHostsContent += "# ---------------- %(name)s ----------------\n%(content)s\n" % hosts
-            else:
-                hosts["active"] = hosts["id"] == hostsId
 
         hostsToApply = commonHostsContent + "\n" + currentHostsContent
-
-        if Hosts.Save2System(hostsToApply):
-            Hosts.TryFlushDNSCache()
-            MessageBox("Hosts已设置为" + currentHosts["name"], "保存成功", ICON_NONE)
-        else:
-            MessageBox("保存失败", "提示", ICON_ERROR)
-        self.InitHostsTree(ID_SYSTEM_HOSTS)
+        try:
+            if Hosts.Save2System(hostsToApply):
+                Hosts.TryFlushDNSCache()
+                for hosts in Settings.settings["hosts"]:
+                    hosts["active"] = hosts["id"] == hostsId
+                MessageBox("Hosts已设置为" + currentHosts["name"], "保存成功", ICON_NONE)
+            else:
+                MessageBox("保存失败", "提示", ICON_ERROR)
+            self.InitHostsTree(ID_SYSTEM_HOSTS)
+        except Exception as e:
+            if "Permission denied" in str(e):
+                MessageBox("尝试写入hosts时权限不足, 保存失败, 请以管理员身份运行该软件", "权限不足", ICON_ERROR)
+            else:
+                MessageBox(str(e), "保存时出错", ICON_ERROR)
 
     def ShowEditDialog(self, hosts):
         self.editDialog.Show()

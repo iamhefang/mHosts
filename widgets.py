@@ -95,7 +95,7 @@ class MainFrame(Frame):
         # bSizer1.Add(self.hostsListView, 0, EXPAND, 5)
 
         # WARNING: wxPython code generation isn't supported for this widget yet.
-        self.codeEditor = CodeView(self)
+        self.codeEditor = CodeView(self, dpi)
         bSizer1.Add(self.codeEditor, 1, EXPAND, 5)
 
         self.SetSizer(bSizer1)

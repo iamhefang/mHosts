@@ -38,12 +38,15 @@ class MainWindow(MainFrame):
     def InitHostsTree(self, select=None):
         self.hostsTree.DeleteAllItems()
         root = self.hostsTree.AddRoot("全部Hosts", image=self.images["logo"])
-        selectId = self.hostsTree.AppendItem(root, "当前系统", image=self.images[sys.platform], data=systemHosts)
+        selectId = self.hostsTree.AppendItem(
+            root, "当前系统", image=self.images[sys.platform], data=systemHosts)
         for hosts in Settings.settings["hosts"]:
-            itemId = self.hostsTree.AppendItem(root, hosts["name"], data=hosts, image=self.images[hosts["icon"]])
+            itemId = self.hostsTree.AppendItem(
+                root, hosts["name"], data=hosts, image=self.images[hosts["icon"]])
             self.hostsTree.SetItemBold(itemId, hosts["active"])
             if hosts["active"]:
-                self.hostsTree.SetItemTextColour(itemId, Colour(0x12, 0x96, 0xdb))
+                self.hostsTree.SetItemTextColour(
+                    itemId, Colour(0x12, 0x96, 0xdb))
             if hosts["id"] == select:
                 selectId = itemId
         self.hostsTree.ExpandAll()
@@ -65,7 +68,10 @@ class MainWindow(MainFrame):
         self.Bind(EVT_CLOSE, self.OnWindowClose)
         self.statusBar.SetFieldsCount(3)
         self.SetStatusWidths([-1, -2, -1])
-        self.statusBar.SetStatusText("当前共%d个Hosts规则" % len(Settings.settings["hosts"]), 0)
+        self.statusBar.SetStatusText(
+            "当前共%d个Hosts规则" % len(Settings.settings["hosts"]), 0
+        )
+        self.statusBar.SetStatusText("编辑自动保存, 双击应用到系统", 1)
         self.hostsTree.Bind(EVT_TREE_SEL_CHANGED, self.OnHostsTreeItemSelect)
         self.hostsTree.Bind(EVT_TREE_ITEM_RIGHT_CLICK, self.ShowTreeItemMenu)
         self.hostsTree.Bind(EVT_TREE_ITEM_ACTIVATED, self.OnHostsTreeActivated)
@@ -87,7 +93,8 @@ class MainWindow(MainFrame):
             return
         self.__currentSelectHost = hosts
         menu = Menu()
-        popMenuActive = menu.Append(TrayIcon.ID_TREE_MENU_SET_ACTIVE, "设置为当前Hosts")
+        popMenuActive = menu.Append(
+            TrayIcon.ID_TREE_MENU_SET_ACTIVE, "设置为当前Hosts")
         if hosts["id"] == ID_SYSTEM_HOSTS or hosts['alwaysApply']:
             popMenuActive.Enable(False)
         else:
@@ -100,7 +107,7 @@ class MainWindow(MainFrame):
         popMenuDelete = menu.Append(TrayIcon.ID_TREE_MENU_DELETE, "删除")
         popMenuDelete.Enable(hosts["id"] != ID_SYSTEM_HOSTS)
 
-        popMenuRefresh = menu.Append(TrayIcon.ID_TREE_MENU_REFRESH, "刷新")
+        # menu.Append(TrayIcon.ID_TREE_MENU_REFRESH, "刷新")
 
         self.hostsTree.PopupMenu(menu, event.GetPoint())
         self.hostsTree.Bind(EVT_MENU, self.OnMenuClicked)
@@ -114,7 +121,8 @@ class MainWindow(MainFrame):
         if not hosts:
             return
         self.codeEditor.SetReadOnly(False)
-        self.codeEditor.SetValue(Hosts.GetSystemHosts() if hosts["id"] == ID_SYSTEM_HOSTS else hosts["content"])
+        self.codeEditor.SetValue(Hosts.GetSystemHosts(
+        ) if hosts["id"] == ID_SYSTEM_HOSTS else hosts["content"])
         self.codeEditor.SetReadOnly(hosts["readOnly"])
         self.codeEditor.SetHosts(hosts)
 
@@ -135,7 +143,8 @@ class MainWindow(MainFrame):
         pass
 
     def ApplyHosts(self, hostsId: int):
-        commonHostsContent = "# hosts file apply by mHosts v%s, %s\n " % (Settings.version(), Now())
+        commonHostsContent = "# hosts file apply by mHosts v%s, %s\n " % (
+            Settings.version(), Now())
         currentHostsContent = ""
         currentHosts = None
 
@@ -158,7 +167,8 @@ class MainWindow(MainFrame):
             self.InitHostsTree(ID_SYSTEM_HOSTS)
         except Exception as e:
             if "Permission denied" in str(e):
-                MessageBox("尝试写入hosts时权限不足, 保存失败, 请以管理员身份运行该软件", "权限不足", ICON_ERROR)
+                MessageBox("尝试写入hosts时权限不足, 保存失败, 请以管理员身份运行该软件",
+                           "权限不足", ICON_ERROR)
             else:
                 MessageBox(str(e), "保存时出错", ICON_ERROR)
 
@@ -186,14 +196,16 @@ class MainWindow(MainFrame):
                 "--disable-plugins --disable-extensions"
             ),
             TrayIcon.ID_TREE_MENU_EDIT: lambda: self.ShowEditDialog(self.__currentSelectHost),
-            TrayIcon.ID_TREE_MENU_SET_ACTIVE: lambda: self.ApplyHosts(self.__currentSelectHost["id"])
+            TrayIcon.ID_TREE_MENU_SET_ACTIVE: lambda: self.ApplyHosts(
+                self.__currentSelectHost["id"])
         }
         if event.GetId() in handlers:
             callback = handlers[event.GetId()]
             if callable(callback):
                 callback()
             else:
-                MessagePanel.Send("该菜单绑定的事件不可用", "菜单点击", dpi=(self.dpiX, self.dpiY))
+                MessagePanel.Send("该菜单绑定的事件不可用", "菜单点击",
+                                  dpi=(self.dpiX, self.dpiY))
         else:
             MessagePanel.Send("该菜单没有绑定事件", "菜单点击", dpi=(self.dpiX, self.dpiY))
 

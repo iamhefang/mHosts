@@ -3,27 +3,27 @@
 block_cipher = None
 
 datas = [
-    (r'./icons',r'icons'),
-    (r'./mHosts.json','.'),
-    (r'./icons/aliyun.png',r'icons'),
-    (r'./icons/chrome.png',r'icons'),
-    (r'./icons/darwin.png',r'icons'),
-    (r'./icons/database.png',r'icons'),
-    (r'./icons/edge.png',r'icons'),
-    (r'./icons/firefox.png',r'icons'),
-    (r'./icons/java.png',r'icons'),
-    (r'./icons/linux.png',r'icons'),
-    (r'./icons/logo.ico',r'icons'),
-    (r'./icons/logo.png',r'icons'),
-    (r'./icons/mysql.png',r'icons'),
-    (r'./icons/postgresql.png',r'icons'),
-    (r'./icons/python.png',r'icons'),
-    (r'./icons/qq.png',r'icons'),
-    (r'./icons/server.png',r'icons'),
-    (r'./icons/table.png',r'icons'),
-    (r'./icons/user.png',r'icons'),
-    (r'./icons/wechat.png',r'icons'),
-    (r'./icons/win32.png',r'icons')
+    (r'./icons', r'icons'),
+    (r'./mHosts.json', '.'),
+    (r'./icons/aliyun.png', r'icons'),
+    (r'./icons/chrome.png', r'icons'),
+    (r'./icons/darwin.png', r'icons'),
+    (r'./icons/database.png', r'icons'),
+    (r'./icons/edge.png', r'icons'),
+    (r'./icons/firefox.png', r'icons'),
+    (r'./icons/java.png', r'icons'),
+    (r'./icons/linux.png', r'icons'),
+    (r'./icons/logo.ico', r'icons'),
+    (r'./icons/logo.png', r'icons'),
+    (r'./icons/mysql.png', r'icons'),
+    (r'./icons/postgresql.png', r'icons'),
+    (r'./icons/python.png', r'icons'),
+    (r'./icons/qq.png', r'icons'),
+    (r'./icons/server.png', r'icons'),
+    (r'./icons/table.png', r'icons'),
+    (r'./icons/user.png', r'icons'),
+    (r'./icons/wechat.png', r'icons'),
+    (r'./icons/win32.png', r'icons')
 ]
 
 a = Analysis(
@@ -54,6 +54,6 @@ exe = EXE(
     strip=False,
     upx=False,
     runtime_tmpdir=None,
-    console=False ,
+    console=False,
     icon='icons\\logo.ico'
 )

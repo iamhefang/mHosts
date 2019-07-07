@@ -1,8 +1,8 @@
 # _*_ coding: utf-8 _*_
 import sys
 
-from settings import Settings
-from views.MainWindow import MainWindow
+from src.settings import Settings
+from src.views.MainWindow import MainWindow
 
 if __name__ == '__main__':
     Settings.Init()

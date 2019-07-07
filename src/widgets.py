@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import sys
+from threading import Timer
 
 from wx import Frame, DEFAULT_FRAME_STYLE, SYSTEM_MENU, TAB_TRAVERSAL, MenuBar, Menu, MenuItem, ITEM_NORMAL, StatusBar, \
     STB_SIZEGRIP, Font, FONTFAMILY_DEFAULT, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL, \
@@ -7,12 +9,13 @@ from wx import Frame, DEFAULT_FRAME_STYLE, SYSTEM_MENU, TAB_TRAVERSAL, MenuBar, 
     Size, DefaultSize, Icon, BITMAP_TYPE_ICO, BoxSizer, VERTICAL, EXPAND, BOTH, FLEX_GROWMODE_SPECIFIED, FlexGridSizer, \
     RadioButton, StaticText, TextCtrl, Button, ALL, EVT_RADIOBUTTON, EVT_BUTTON, MessageBox, ICON_WARNING, \
     ComboBox, \
-    ImageList, EVT_CLOSE
+    ImageList, EVT_CLOSE, FONTWEIGHT_BOLD, Colour, SIMPLE_BORDER, \
+    TRANSPARENT_WINDOW, DisplaySize
 
-from helpers import iconPath, GetIcons, Now
-from settings import Settings, hostsDict
-from views.CodeView import CodeView
-from views.HtmlView import HtmlView
+from src.helpers import iconPath, GetIcons, Now
+from src.settings import Settings, hostsDict
+from src.views.AboutView import AboutView
+from src.views.CodeView import CodeView
 
 
 class MainFrame(Frame):
@@ -32,7 +35,8 @@ class MainFrame(Frame):
             self.menuFile, ID_ANY, u"新建(&N)", EmptyString, ITEM_NORMAL)
         self.menuItemImport = MenuItem(
             self.menuFile, ID_ANY, u"导入(&I)", EmptyString, ITEM_NORMAL)
-        self.menuItemImport.Enable(False)
+        if sys.platform != "linux":
+            self.menuItemImport.Enable(False)
         self.menuFile.Append(self.menuItemNew)
         self.menuFile.Append(self.menuItemImport)
 
@@ -48,7 +52,8 @@ class MainFrame(Frame):
 
         self.menuItemSettings = MenuItem(
             self.menuHelp, ID_ANY, u"首选项(&P)", EmptyString, ITEM_NORMAL)
-        self.menuItemSettings.Enable(False)
+        if sys.platform != "linux":
+            self.menuItemSettings.Enable(False)
         self.menuHelp.Append(self.menuItemSettings)
 
         self.menuItemHelpDoc = MenuItem(
@@ -127,10 +132,6 @@ class MainFrame(Frame):
         event.Skip()
 
 
-###########################################################################
-# Class AboutDialog
-###########################################################################
-
 class AboutDialog(Dialog):
 
     def __init__(self, parent, dpi=(1, 1)):
@@ -140,16 +141,14 @@ class AboutDialog(Dialog):
             title=u" 关于 mHosts - v%s" % Settings.version(),
             pos=DefaultPosition,
             style=DEFAULT_DIALOG_STYLE,
-            size=Size(500 * dpi[0], 400 * dpi[1])
+            size=Size(400 * dpi[0], 300 * dpi[1])
         )
-        # size = DisplaySize()
-        # self.SetSize(self.ConvertDialogToPixels())
         self.SetSizeHints(DefaultSize, DefaultSize)
         self.SetIcon(Icon(iconPath, BITMAP_TYPE_ICO))
         bSizer2 = BoxSizer(VERTICAL)
 
-        self.htmlWindow = HtmlView(self, self.GetSize())
-        bSizer2.Add(self.htmlWindow, 0, EXPAND, 0)
+        self.aboutDialog = AboutView(self, self.GetSize())
+        bSizer2.Add(self.aboutDialog, 0, EXPAND, 0)
 
         self.SetSizer(bSizer2)
         self.Layout()
@@ -169,7 +168,7 @@ class EditDialog(Dialog):
             self, parent,
             id=ID_ANY,
             title=u"编辑/添加Hosts",
-            pos=DefaultPosition,
+            pos=Point(600, 600),
             size=Size(394 * dpi[0], 210 * dpi[1]),
             style=DEFAULT_DIALOG_STYLE
         )
@@ -305,3 +304,61 @@ class EditDialog(Dialog):
 
     def OnRadioChange(self, event):
         self.urlInput.Enable(event.GetId() == self.onlineRadio.GetId())
+
+
+class MessagePanel(Frame):
+
+    def __init__(self, dpi=(1, 1)):
+        width = 300 * dpi[0]
+        height = 80 * dpi[1]
+        screenSize = DisplaySize()
+        x = screenSize[0] - width - 10 * dpi[0],
+        y = screenSize[1] - height - 100 * dpi[1]
+        Frame.__init__(
+            self,
+            parent=None,
+            id=ID_ANY,
+            pos=Point(x[0], y),
+            size=Size(width, height),
+            style=SIMPLE_BORDER | TRANSPARENT_WINDOW,
+            name=EmptyString
+        )
+
+        bSizer4 = BoxSizer(VERTICAL)
+
+        self.msgTitle = StaticText(self, ID_ANY, u"MyLabel", DefaultPosition, DefaultSize, 0)
+        self.msgTitle.Wrap(-1)
+
+        self.msgTitle.SetFont(Font(13, FONTFAMILY_DEFAULT, FONTSTYLE_NORMAL, FONTWEIGHT_BOLD, False, EmptyString))
+
+        bSizer4.Add(self.msgTitle, 0, ALL, 5)
+
+        self.msgContent = StaticText(self, ID_ANY, u"MyLabel", DefaultPosition, DefaultSize, 0)
+        self.msgContent.Wrap(-1)
+
+        self.msgContent.SetFont(
+            Font(12, FONTFAMILY_DEFAULT, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL, False, EmptyString))
+
+        bSizer4.Add(self.msgContent, 0, EXPAND, 5)
+
+        self.SetSizer(bSizer4)
+        self.Layout()
+        # colorWhite = Colour(255, 255, 255)
+        self.SetBackgroundColour(Colour(200, 200, 200))
+        # self.msgTitle.SetForegroundColour(colorWhite)
+        # self.msgContent.SetForegroundColour(colorWhite)
+
+    def __del__(self):
+        pass
+
+    @staticmethod
+    def Send(message: str, title: str, dpi=(1, 1), delay=5):
+        dialog = MessagePanel(dpi)
+        dialog.msgTitle.SetLabelText(title)
+        dialog.msgContent.SetLabelText(message)
+        dialog.Show()
+        if delay > 0:
+            Timer(delay, dialog.CloseNotify).start()
+
+    def CloseNotify(self):
+        self.Close()

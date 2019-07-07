@@ -1,8 +1,8 @@
 import json
 import os
 
-import Hosts
-from helpers import WriteText, GetChromePath, ResPath, Now
+from src import Hosts
+from src.helpers import WriteText, GetChromePath, ResPath, Now
 
 settingPath = "settings.json"
 

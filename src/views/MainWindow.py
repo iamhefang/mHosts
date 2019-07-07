@@ -1,17 +1,17 @@
 import sys
 from subprocess import Popen
 
-from wx import App, MessageBox, ICON_ERROR, OK, ICON_NONE, EVT_CLOSE, LaunchDefaultBrowser, DisplaySize, \
+from wx import App, MessageBox, ICON_ERROR, EVT_CLOSE, LaunchDefaultBrowser, DisplaySize, \
     EVT_TREE_SEL_CHANGED, EVT_TREE_ITEM_RIGHT_CLICK, Menu, EVT_MENU, CommandEvent, Colour, EVT_TREE_ITEM_ACTIVATED, \
     Locale, LANGUAGE_CHINESE_SIMPLIFIED
 from wx.stc import EVT_STC_CHANGE
 
-import Hosts
-from CheckNewVersionThread import CheckNewVersionThread
-from helpers import NowToTimestamp, Now
-from settings import Settings, systemHosts, ID_SYSTEM_HOSTS
-from views.TrayIcon import TrayIcon
-from widgets import MainFrame, AboutDialog, EditDialog
+from src import Hosts
+from src.CheckNewVersionThread import CheckNewVersionThread
+from src.helpers import NowToTimestamp, Now
+from src.settings import Settings, systemHosts, ID_SYSTEM_HOSTS
+from src.views.TrayIcon import TrayIcon
+from src.widgets import MainFrame, AboutDialog, EditDialog, MessagePanel
 
 
 class MainWindow(MainFrame):
@@ -152,7 +152,7 @@ class MainWindow(MainFrame):
                 Hosts.TryFlushDNSCache()
                 for hosts in Settings.settings["hosts"]:
                     hosts["active"] = hosts["id"] == hostsId
-                MessageBox("Hosts已设置为" + currentHosts["name"], "保存成功", ICON_NONE)
+                MessagePanel.Send("Hosts已设置为" + currentHosts["name"], "保存成功")
             else:
                 MessageBox("保存失败", "提示", ICON_ERROR)
             self.InitHostsTree(ID_SYSTEM_HOSTS)
@@ -193,9 +193,9 @@ class MainWindow(MainFrame):
             if callable(callback):
                 callback()
             else:
-                print("该菜单绑定的事件不可用")
+                MessagePanel.Send("该菜单绑定的事件不可用", "菜单点击", dpi=(self.dpiX, self.dpiY))
         else:
-            print("该菜单没有绑定事件")
+            MessagePanel.Send("该菜单没有绑定事件", "菜单点击", dpi=(self.dpiX, self.dpiY))
 
     def CheckUpdate(self):
         CheckNewVersionThread(self).start()
@@ -212,7 +212,7 @@ class MainWindow(MainFrame):
     @staticmethod
     def DoRefreshDNS():
         Hosts.TryFlushDNSCache()
-        MessageBox(u"刷新DNS成功", u"提示", OK | ICON_NONE)
+        MessagePanel.Send(u"刷新DNS成功", u"提示")
 
     def Exit(self):
         self.trayIcon.Destroy()

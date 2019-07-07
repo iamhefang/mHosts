@@ -1,8 +1,10 @@
+import sys
+
 from wx import MenuItem, Icon, BITMAP_TYPE_ICO, Menu, EVT_MENU, NewId, adv, ITEM_CHECK, ID_ANY, Bitmap, BITMAP_TYPE_PNG
 from wx.adv import TaskBarIcon
 
-from helpers import iconPath, ResPath
-from settings import Settings
+from src.helpers import iconPath, ResPath
+from src.settings import Settings
 
 
 class TrayIcon(TaskBarIcon):
@@ -50,7 +52,8 @@ class TrayIcon(TaskBarIcon):
     def CreatePopupMenu(self):
         menu = Menu()
         appMenuItem = menu.Append(ID_ANY, "mHosts v" + Settings.version())
-        appMenuItem.Enable(False)
+        if sys.platform != "linux":
+            appMenuItem.Enable(False)
         appMenuItem.SetBitmap(Bitmap(ResPath("icons/logo.png"), BITMAP_TYPE_PNG))
         menu.Append(self.ID_TOGGLE, r"%s主窗口" % ("隐藏" if self.__window.IsShown() else "显示"))
         menu.AppendSeparator()
@@ -63,7 +66,8 @@ class TrayIcon(TaskBarIcon):
 
         newHostMenu = Menu()
         newHostMenu.Append(self.ID_NEW, "新建")
-        newHostMenu.Append(self.ID_IMPORT, "导入").Enable(False)
+        if sys.platform != "linux":
+            newHostMenu.Append(self.ID_IMPORT, "导入").Enable(False)
         menu.Append(-1, "新建Hosts方案", newHostMenu)
 
         menu.AppendSeparator()
@@ -76,7 +80,8 @@ class TrayIcon(TaskBarIcon):
             menu.Append(-1, "启动 Google Chrome 浏览器", chromeMenu)
 
         menu.AppendSeparator()
-        menu.Append(self.ID_UPDATE, "更新").Enable(False)
+        if sys.platform != "linux":
+            menu.Append(self.ID_UPDATE, "更新").Enable(False)
         menu.Append(self.ID_EXIT, "退出")
         self.menu = menu
         return menu

@@ -1,7 +1,7 @@
 import os
 import sys
 
-from helpers import ReadText, WriteText
+from src.helpers import ReadText, WriteText
 
 
 def Save2System(content):

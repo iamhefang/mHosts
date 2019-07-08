@@ -1,3 +1,4 @@
+import os
 import sys
 
 from wx import EVT_KEY_UP, EVT_KEY_DOWN
@@ -62,8 +63,8 @@ class CodeView(StyledTextCtrl):
     def OnChange(self, event):
         pass
 
-    def SetValue(self, value):
-        StyledTextCtrl.SetValue(self, value)
+    def SetValue(self, value: str):
+        StyledTextCtrl.SetValue(self, value.replace(os.linesep, "\n"))
         self.EmptyUndoBuffer()
 
     def SetHosts(self, hosts: dict):

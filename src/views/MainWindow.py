@@ -1,3 +1,4 @@
+import os
 import sys
 from subprocess import Popen
 
@@ -8,7 +9,7 @@ from wx.stc import EVT_STC_CHANGE
 
 from src import Hosts
 from src.CheckNewVersionThread import CheckNewVersionThread
-from src.helpers import NowToTimestamp, Now
+from src.helpers import NowToTimestamp, Now, ParseHosts
 from src.settings import Settings, systemHosts, ID_SYSTEM_HOSTS
 from src.views.TrayIcon import TrayIcon
 from src.widgets import MainFrame, AboutDialog, EditDialog, MessagePanel
@@ -146,21 +147,28 @@ class MainWindow(MainFrame):
         pass
 
     def ApplyHosts(self, hostsId: int):
-        commonHostsContent = "# hosts file apply by mHosts v%s, %s\n " % (
-            Settings.version(), Now())
-        currentHostsContent = ""
+        commonHostsLines = "# hosts file apply by mHosts v%s, %s\n " % (Settings.version(), Now())
+        currentHostsLines = ""
         currentHosts = None
 
         for hosts in Settings.settings["hosts"]:
             if hosts["id"] == hostsId:
-                currentHostsContent = "# ---------------- %(name)s ----------------\n%(content)s\n" % hosts
+                currentHostsLines += "# ---------------- %(name)s ----------------%(br)s%(content)s%(br)s" % {
+                    "name": hosts['name'],
+                    "br": os.linesep,
+                    "content": hosts['content']
+                }
                 currentHosts = hosts
             if hosts["alwaysApply"]:
-                commonHostsContent += "# ---------------- %(name)s ----------------\n%(content)s\n" % hosts
+                commonHostsLines += "# ---------------- %(name)s ----------------%(br)s%(content)s%(br)s" % {
+                    "name": hosts['name'],
+                    "br": os.linesep,
+                    "content": hosts['content']
+                }
 
-        hostsToApply = commonHostsContent + "\n" + currentHostsContent
+        hostsToApply = commonHostsLines + os.linesep + currentHostsLines
         try:
-            if Hosts.Save2System(hostsToApply):
+            if Hosts.Save2System(ParseHosts(hostsToApply)):
                 for hosts in Settings.settings["hosts"]:
                     hosts["active"] = hosts["id"] == hostsId
                 refreshDnsRes = Hosts.TryFlushDNSCache()
@@ -174,8 +182,7 @@ class MainWindow(MainFrame):
             self.InitHostsTree(ID_SYSTEM_HOSTS)
         except Exception as e:
             if "Permission denied" in str(e):
-                MessageBox("尝试写入hosts时权限不足, 保存失败, 请以管理员身份运行该软件",
-                           "权限不足", ICON_ERROR)
+                MessageBox("尝试写入hosts时权限不足, 保存失败, 请以管理员身份运行该软件", "权限不足", ICON_ERROR)
             else:
                 MessageBox(str(e), "保存时出错", ICON_ERROR)
 

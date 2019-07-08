@@ -1,8 +1,10 @@
 # _*_ coding: utf-8 _*_
 import json
 import os
+import re
 import sys
 from time import strftime, localtime, time, strptime, mktime
+from typing import AnyStr
 from urllib import request
 
 from wx import BITMAP_TYPE_PNG, Bitmap
@@ -69,13 +71,13 @@ def ReadLines(file, encoding="utf-8") -> list:
         return file.readlines()
 
 
-def WriteText(file, text, encoding="utf-8") -> int:
-    with open(file, mode="w+", encoding=encoding) as file:
+def WriteText(file: AnyStr, text: AnyStr, encoding="utf-8") -> int:
+    with open(file.encode("utf-8"), mode="w", encoding=encoding) as file:
         return file.write(text)
 
 
 def WriteLines(file, lines, encoding="utf-8"):
-    with open(file, mode="w+", encoding=encoding) as file:
+    with open(file, mode="w", encoding=encoding) as file:
         file.writelines(lines)
 
 
@@ -90,3 +92,22 @@ def GetChromePath() -> str:
     elif sys.platform == "linux":
         path = "google-chrome"
     return path
+
+
+def ParseHosts(content: AnyStr) -> str:
+    obj = {}
+    hosts = []
+    lines = content.splitlines()
+    lines.reverse()
+    for line in lines:
+        lineList = re.sub(r' +', ' ', line).split(" ")
+        if len(lineList) == 2:
+            obj[lineList[1].lower()] = lineList[0].strip()
+        else:
+            obj[line] = ""
+
+    for address, ip in obj.items():
+        hosts.append((u"%s %s" % (ip, address)).strip())
+
+    hosts.reverse()
+    return os.linesep.join(hosts)

@@ -1,12 +1,12 @@
 import sys
 
-from wx import EVT_KEY_UP
+from wx import EVT_KEY_UP, EVT_KEY_DOWN
 from wx.stc import StyledTextCtrl, STC_MARGIN_NUMBER, STC_STYLE_LINENUMBER, STC_STYLE_DEFAULT, EVT_STC_CHANGE, \
     STC_P_DEFAULT, STC_P_COMMENTLINE, STC_P_CHARACTER, STC_P_CLASSNAME, STC_LEX_CONF
 
 if sys.platform == 'win32':
     style = {
-        'font': 'Consoles',
+        'font': 'Consolas',
         'size': 10,
     }
 elif sys.platform == 'darwin':
@@ -45,6 +45,7 @@ class CodeView(StyledTextCtrl):
 
         self.Bind(EVT_STC_CHANGE, self.OnChange)
         self.Bind(EVT_KEY_UP, self.OnCodeEditorKeyUp)
+        self.Bind(EVT_KEY_DOWN, self.OnKeyDown)
 
     def InitStyle(self):
         self.SetLexer(STC_LEX_CONF)
@@ -56,16 +57,27 @@ class CodeView(StyledTextCtrl):
         # 注释
         self.StyleSetSpec(STC_P_COMMENTLINE, "fore:#999999,face:%(font)s,size:%(size)d" % style)
         # ip地址
-        self.StyleSetSpec(STC_P_CLASSNAME, "fore:#0000FF,underline,size:%(size)d" % style)
+        self.StyleSetSpec(STC_P_CLASSNAME, "fore:#0000FF,size:%(size)d" % style)
 
     def OnChange(self, event):
         pass
 
+    def SetValue(self, value):
+        StyledTextCtrl.SetValue(self, value)
+        self.EmptyUndoBuffer()
+
     def SetHosts(self, hosts: dict):
         self.__hosts = hosts
 
-    def OnCodeEditorKeyUp(self, event):
-        if event.cmdDown and event.KeyCode == 83:
+    def OnKeyDown(self, event):
+        if event.cmdDown and event.KeyCode == 47:
+            # lineNumber = self.GetCurrentLine()
+            # (CharBuffer, linePos) = self.GetCurLine()
+            # self.InsertText(0, "#")
             pass
+        else:
+            event.Skip()
+
+    def OnCodeEditorKeyUp(self, event):
         if self.__hosts:
             self.__hosts["content"] = self.GetValue()

@@ -10,7 +10,7 @@ from wx import Frame, DEFAULT_FRAME_STYLE, SYSTEM_MENU, TAB_TRAVERSAL, MenuBar, 
     RadioButton, StaticText, TextCtrl, Button, ALL, EVT_RADIOBUTTON, EVT_BUTTON, MessageBox, ICON_WARNING, \
     ComboBox, \
     ImageList, EVT_CLOSE, FONTWEIGHT_BOLD, Colour, SIMPLE_BORDER, \
-    TRANSPARENT_WINDOW, DisplaySize
+    TRANSPARENT_WINDOW, DisplaySize, STAY_ON_TOP
 
 from src.helpers import iconPath, GetIcons, Now
 from src.settings import Settings, hostsDict
@@ -320,7 +320,7 @@ class MessagePanel(Frame):
             id=ID_ANY,
             pos=Point(x[0], y),
             size=Size(width, height),
-            style=SIMPLE_BORDER | TRANSPARENT_WINDOW,
+            style=SIMPLE_BORDER | TRANSPARENT_WINDOW | STAY_ON_TOP,
             name=EmptyString
         )
 

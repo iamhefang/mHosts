@@ -48,7 +48,7 @@ def TryFlushDNSCache():
             cmd = "dscacheutil -flushcache"
         else:
             return False
-        os.popen(cmd)
+        os.system(cmd)
         return True
     except:
         return False

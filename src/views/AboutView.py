@@ -7,7 +7,10 @@ from src.settings import Settings
 class AboutView(HtmlWindow):
     def __init__(self, parent, size):
         HtmlWindow.__init__(self, parent, ID_ANY, DefaultPosition, size=size, style=html.HW_SCROLLBAR_AUTO)
-        self.SetPage("""
+        params = {
+            "version": Settings.version()
+        }
+        self.SetPage(u"""
 <!doctype html>
 <html lang="zh">
 <head>
@@ -22,14 +25,18 @@ class AboutView(HtmlWindow):
 <h4>免费好用的跨平台Hosts管理工具</h4>
 <table style="width:100%%">
 <tr>
-    <td>项目地址:</td>
+    <td style='text-align: right;'>作者:</td>
+    <td><a href="https://hefang.link/?from=mHosts%(version)s" title="点击访问何方博客">何方</a></td>
+</tr>
+<tr>
+    <td style='text-align: right;'>项目地址:</td>
     <td>
         <a href="https://github.com/iamhefang/mHosts">https://github.com/iamhefang/mHosts</a>
     </td>
 </tr>
 </table>
 </body>
-</html>""" % {"version": Settings.version()})
+</html>""" % params)
 
     def OnLinkClicked(self, link):
         LaunchDefaultBrowser(link.GetHref())

@@ -129,6 +129,8 @@ class MainWindow(MainFrame):
     def ToggleWindow(self):
         self.Iconize(not self.IsIconized())
         self.Show(not self.IsShown())
+        if self.IsShown():
+            self.Raise()
 
     def OnWindowClose(self, event):
         self.Iconize(True)
@@ -158,10 +160,13 @@ class MainWindow(MainFrame):
         hostsToApply = commonHostsContent + "\n" + currentHostsContent
         try:
             if Hosts.Save2System(hostsToApply):
-                Hosts.TryFlushDNSCache()
                 for hosts in Settings.settings["hosts"]:
                     hosts["active"] = hosts["id"] == hostsId
-                MessagePanel.Send("Hosts已设置为" + currentHosts["name"], "保存成功")
+                MessagePanel.Send(
+                    "Hosts已设置为" + currentHosts["name"] + "\nDNS缓存刷新" + ("成功" if Hosts.TryFlushDNSCache() else "失败"),
+                    "保存成功",
+                    dpi=(self.dpiX, self.dpiY)
+                )
             else:
                 MessageBox("保存失败", "提示", ICON_ERROR)
             self.InitHostsTree(ID_SYSTEM_HOSTS)

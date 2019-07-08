@@ -1,5 +1,6 @@
 import os
 import sys
+from subprocess import Popen, DEVNULL, PIPE
 
 from src.helpers import ReadText, WriteText
 
@@ -48,7 +49,8 @@ def TryFlushDNSCache():
             cmd = "dscacheutil -flushcache"
         else:
             return False
-        os.system(cmd)
+        Popen(cmd, stderr=DEVNULL, stdin=PIPE, stdout=PIPE, shell=True)
         return True
-    except:
+    except Exception as e:
+        WriteText("error.log", str(e))
         return False

@@ -162,8 +162,9 @@ class MainWindow(MainFrame):
             if Hosts.Save2System(hostsToApply):
                 for hosts in Settings.settings["hosts"]:
                     hosts["active"] = hosts["id"] == hostsId
+                refreshDnsRes = Hosts.TryFlushDNSCache()
                 MessagePanel.Send(
-                    "Hosts已设置为" + currentHosts["name"] + "\nDNS缓存刷新" + ("成功" if Hosts.TryFlushDNSCache() else "失败"),
+                    "Hosts已设置为" + currentHosts["name"] + "\nDNS缓存刷新" + ("成功" if refreshDnsRes else "失败"),
                     "保存成功",
                     dpi=(self.dpiX, self.dpiY)
                 )

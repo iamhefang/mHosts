@@ -112,13 +112,10 @@ class MainFrame(Frame):
         self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemNew.GetId())
         self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemExit.GetId())
         self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemAbout.GetId())
-        self.Bind(EVT_MENU, self.OnMenuClicked,
-                  id=self.menuItemHelpDoc.GetId())
-        self.Bind(EVT_MENU, self.OnMenuClicked,
-                  id=self.menuItemSettings.GetId())
+        self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemHelpDoc.GetId())
+        self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemSettings.GetId())
         self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemImport.GetId())
-        self.Bind(EVT_MENU, self.OnMenuClicked,
-                  id=self.menuItemCheckUpdate.GetId())
+        self.Bind(EVT_MENU, self.OnMenuClicked, id=self.menuItemCheckUpdate.GetId())
 
     def __del__(self):
         pass
@@ -295,8 +292,8 @@ class EditDialog(Dialog):
                     name,
                     url=url,
                     lastUpdateTime=Now(),
-                    content="# Created by mHosts v%s, %s\n" % (
-                        Settings.version(), Now())
+                    content="# Created by mHosts v%s, %s\n" % (Settings.version(), Now()),
+                    icon=self.iconComboBox.GetValue()
                 ))
             Settings.Save()
             self.__window.InitHostsTree(select=hostsId)

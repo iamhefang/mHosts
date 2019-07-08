@@ -9,7 +9,7 @@ from src.settings import Settings
 
 class TrayIcon(TaskBarIcon):
     ID_EXIT = NewId()
-    ID_UPDATE = NewId()
+    ID_ABOUT = NewId()
     ID_TOGGLE = NewId()
     ID_REFRESH_DNS = NewId()
     # 新建Hosts
@@ -41,7 +41,7 @@ class TrayIcon(TaskBarIcon):
             self.ID_REFRESH_DNS,
             self.ID_TOGGLE,
             self.ID_EXIT,
-            self.ID_UPDATE,
+            self.ID_ABOUT,
             self.ID_LUNCH_CHROME,
             self.ID_LUNCH_CHROME_CROS,
             self.ID_LUNCH_CHROME_NO_PLUGINS
@@ -80,8 +80,7 @@ class TrayIcon(TaskBarIcon):
             menu.Append(-1, "启动 Google Chrome 浏览器", chromeMenu)
 
         menu.AppendSeparator()
-        if sys.platform != "linux":
-            menu.Append(self.ID_UPDATE, "更新").Enable(False)
+        menu.Append(self.ID_ABOUT, "关于")
         menu.Append(self.ID_EXIT, "退出")
         self.menu = menu
         return menu

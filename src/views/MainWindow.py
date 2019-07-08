@@ -39,14 +39,17 @@ class MainWindow(MainFrame):
         self.hostsTree.DeleteAllItems()
         root = self.hostsTree.AddRoot("全部Hosts", image=self.images["logo"])
         selectId = self.hostsTree.AppendItem(
-            root, "当前系统", image=self.images[sys.platform], data=systemHosts)
+            root, "当前系统", image=self.images[sys.platform], data=systemHosts
+        )
         for hosts in Settings.settings["hosts"]:
             itemId = self.hostsTree.AppendItem(
-                root, hosts["name"], data=hosts, image=self.images[hosts["icon"]])
+                root, hosts["name"], data=hosts, image=self.images[hosts["icon"]]
+            )
             self.hostsTree.SetItemBold(itemId, hosts["active"])
             if hosts["active"]:
                 self.hostsTree.SetItemTextColour(
-                    itemId, Colour(0x12, 0x96, 0xdb))
+                    itemId, Colour(0x12, 0x96, 0xdb)
+                )
             if hosts["id"] == select:
                 selectId = itemId
         self.hostsTree.ExpandAll()
@@ -93,8 +96,7 @@ class MainWindow(MainFrame):
             return
         self.__currentSelectHost = hosts
         menu = Menu()
-        popMenuActive = menu.Append(
-            TrayIcon.ID_TREE_MENU_SET_ACTIVE, "设置为当前Hosts")
+        popMenuActive = menu.Append(TrayIcon.ID_TREE_MENU_SET_ACTIVE, "设置为当前Hosts")
         if hosts["id"] == ID_SYSTEM_HOSTS or hosts['alwaysApply']:
             popMenuActive.Enable(False)
         else:
@@ -121,8 +123,7 @@ class MainWindow(MainFrame):
         if not hosts:
             return
         self.codeEditor.SetReadOnly(False)
-        self.codeEditor.SetValue(Hosts.GetSystemHosts(
-        ) if hosts["id"] == ID_SYSTEM_HOSTS else hosts["content"])
+        self.codeEditor.SetValue(Hosts.GetSystemHosts() if hosts["id"] == ID_SYSTEM_HOSTS else hosts["content"])
         self.codeEditor.SetReadOnly(hosts["readOnly"])
         self.codeEditor.SetHosts(hosts)
 
@@ -193,6 +194,7 @@ class MainWindow(MainFrame):
             TrayIcon.ID_TOGGLE: self.ToggleWindow,
             TrayIcon.ID_REFRESH_DNS: MainWindow.DoRefreshDNS,
             TrayIcon.ID_NEW: lambda: self.ShowEditDialog(None),
+            TrayIcon.ID_ABOUT: lambda: self.aboutDialog.Show(),
             TrayIcon.ID_IMPORT: None,
             TrayIcon.ID_LUNCH_CHROME: lambda: MainWindow.LunchChrome(),
             TrayIcon.ID_LUNCH_CHROME_CROS: lambda: MainWindow.LunchChrome(
@@ -203,7 +205,9 @@ class MainWindow(MainFrame):
             ),
             TrayIcon.ID_TREE_MENU_EDIT: lambda: self.ShowEditDialog(self.__currentSelectHost),
             TrayIcon.ID_TREE_MENU_SET_ACTIVE: lambda: self.ApplyHosts(
-                self.__currentSelectHost["id"])
+                self.__currentSelectHost["id"]
+            ),
+            TrayIcon.ID_TREE_MENU_DELETE: lambda: self.DeleteHosts(self.__currentSelectHost)
         }
         if event.GetId() in handlers:
             callback = handlers[event.GetId()]
@@ -217,6 +221,17 @@ class MainWindow(MainFrame):
 
     def CheckUpdate(self):
         CheckNewVersionThread(self).start()
+
+    def DeleteHosts(self, hosts: dict):
+        if hosts['active']:
+            MessageBox("无法删除当前应用的hosts", "删除失败", ICON_ERROR)
+            return
+        for index, host in enumerate(Settings.settings["hosts"]):
+            if host["id"] == hosts["id"]:
+                del Settings.settings["hosts"][index]
+                MessagePanel.Send("Hosts'%(name)s'已删除" % hosts, "删除成功", dpi=(self.dpiX, self.dpiY))
+                break
+        self.InitHostsTree()
 
     @staticmethod
     def LunchChrome(args=""):

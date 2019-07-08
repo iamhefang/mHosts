@@ -26,7 +26,7 @@ class AboutView(HtmlWindow):
 <table style="width:100%%">
 <tr>
     <td style='text-align: right;'>作者:</td>
-    <td><a href="https://hefang.link/?from=mHosts%(version)s" title="点击访问何方博客">何方</a></td>
+    <td><a href="https://hefang.link/?from=mHostsv%(version)s" title="点击访问何方博客">何方</a></td>
 </tr>
 <tr>
     <td style='text-align: right;'>项目地址:</td>

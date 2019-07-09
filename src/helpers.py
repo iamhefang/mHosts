@@ -102,7 +102,10 @@ def ParseHosts(content: AnyStr) -> str:
     for line in lines:
         lineList = re.sub(r' +', ' ', line).split(" ")
         if len(lineList) == 2:
-            obj[lineList[1].lower()] = lineList[0].strip()
+            address = lineList[1].lower()
+            if address in obj:
+                continue
+            obj[address] = lineList[0].strip()
         else:
             obj[line] = ""
 

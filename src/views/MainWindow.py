@@ -181,10 +181,11 @@ class MainWindow(MainFrame):
                 MessageBox("保存失败", "提示", ICON_ERROR)
             self.InitHostsTree(ID_SYSTEM_HOSTS)
         except Exception as e:
-            if "Permission denied" in str(e):
+            message = str(e)
+            if "Permission denied" in message:
                 MessageBox("尝试写入hosts时权限不足, 保存失败, 请以管理员身份运行该软件", "权限不足", ICON_ERROR)
             else:
-                MessageBox(str(e), "保存时出错", ICON_ERROR)
+                MessageBox(message, "保存时出错", ICON_ERROR)
 
     def ShowEditDialog(self, hosts):
         self.editDialog.Show()

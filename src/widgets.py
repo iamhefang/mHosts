@@ -10,7 +10,7 @@ from wx import Frame, DEFAULT_FRAME_STYLE, SYSTEM_MENU, TAB_TRAVERSAL, MenuBar, 
     RadioButton, StaticText, TextCtrl, Button, ALL, EVT_RADIOBUTTON, EVT_BUTTON, MessageBox, ICON_WARNING, \
     ComboBox, \
     ImageList, EVT_CLOSE, FONTWEIGHT_BOLD, Colour, SIMPLE_BORDER, \
-    TRANSPARENT_WINDOW, DisplaySize, STAY_ON_TOP
+    TRANSPARENT_WINDOW, DisplaySize, STAY_ON_TOP, FRAME_NO_TASKBAR, FRAME_FLOAT_ON_PARENT
 
 from src.helpers import iconPath, GetIcons, Now
 from src.settings import Settings, hostsDict
@@ -137,7 +137,7 @@ class AboutDialog(Dialog):
             id=ID_ANY,
             title=u" 关于 mHosts - v%s" % Settings.version(),
             pos=DefaultPosition,
-            style=DEFAULT_DIALOG_STYLE,
+            style=DEFAULT_DIALOG_STYLE | FRAME_FLOAT_ON_PARENT,
             size=Size(400 * dpi[0], 300 * dpi[1])
         )
         self.SetSizeHints(DefaultSize, DefaultSize)
@@ -167,7 +167,7 @@ class EditDialog(Dialog):
             title=u"编辑/添加Hosts",
             pos=Point(600, 600),
             size=Size(394 * dpi[0], 210 * dpi[1]),
-            style=DEFAULT_DIALOG_STYLE
+            style=DEFAULT_DIALOG_STYLE | FRAME_FLOAT_ON_PARENT
         )
         self.__window = parent
         self.SetSizeHints(DefaultSize, DefaultSize)
@@ -317,7 +317,7 @@ class MessagePanel(Frame):
             id=ID_ANY,
             pos=Point(x[0], y),
             size=Size(width, height),
-            style=SIMPLE_BORDER | TRANSPARENT_WINDOW | STAY_ON_TOP,
+            style=SIMPLE_BORDER | TRANSPARENT_WINDOW | STAY_ON_TOP | FRAME_NO_TASKBAR,
             name=EmptyString
         )
 
@@ -341,7 +341,7 @@ class MessagePanel(Frame):
         self.SetSizer(bSizer4)
         self.Layout()
         # colorWhite = Colour(255, 255, 255)
-        self.SetBackgroundColour(Colour(200, 200, 200))
+        self.SetBackgroundColour(Colour(240, 240, 240))
         # self.msgTitle.SetForegroundColour(colorWhite)
         # self.msgContent.SetForegroundColour(colorWhite)
 
@@ -349,10 +349,10 @@ class MessagePanel(Frame):
         pass
 
     @staticmethod
-    def Send(message: str, title: str, dpi=(1, 1), delay=5):
+    def Send(message: str, title: str, dpi=(1, 1), delay=3):
         dialog = MessagePanel(dpi)
         dialog.msgTitle.SetLabelText(title)
-        dialog.msgContent.SetLabelText(message)
+        dialog.msgContent.SetLabelText(" " + message.replace("\n", "\n "))
         dialog.Show()
         if delay > 0:
             Timer(delay, dialog.CloseNotify).start()

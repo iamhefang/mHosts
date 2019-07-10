@@ -2,8 +2,9 @@
 
 [English](README_ENG.md)
 
-hosts切换工具
+跨平台hosts切换工具
 
-### 交流QQ群
+支持Mac, Linux和Windows三大主流平台  
 
-![mHosts交流](images/qq_group.jpg)
+开源免费  
+

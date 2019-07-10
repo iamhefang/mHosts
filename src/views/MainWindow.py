@@ -244,11 +244,14 @@ class MainWindow(MainFrame):
     @staticmethod
     def LunchChrome(args=""):
         chromePath = Settings.settings["chromePath"]
-        if chromePath:
+        if os.path.exists(chromePath):
             if ' ' in chromePath:
                 chromePath = '"%s"' % chromePath
             cmd = u'%s %s' % (chromePath, args)
             Popen(cmd)
+        else:
+            Settings.settings["chromePath"] = ""
+            MessageBox("当前配置的Chrome路径'%s'不存在" % chromePath if chromePath else "当前未配置Chrome路径", "启动失败", ICON_ERROR)
 
     @staticmethod
     def DoRefreshDNS():

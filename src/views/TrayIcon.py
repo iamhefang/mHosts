@@ -1,3 +1,4 @@
+import os
 import sys
 
 from wx import MenuItem, Icon, BITMAP_TYPE_ICO, Menu, EVT_MENU, NewId, adv, ITEM_CHECK, ID_ANY, Bitmap, BITMAP_TYPE_PNG
@@ -72,7 +73,7 @@ class TrayIcon(TaskBarIcon):
 
         menu.AppendSeparator()
         menu.Append(self.ID_REFRESH_DNS, u"刷新DNS缓存")
-        if Settings.settings["chromePath"]:
+        if os.path.exists(Settings.settings["chromePath"]):
             chromeMenu = Menu()
             chromeMenu.Append(self.ID_LUNCH_CHROME, "直接启动")
             chromeMenu.Append(self.ID_LUNCH_CHROME_CROS, "允许跨域请求")

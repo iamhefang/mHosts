@@ -82,15 +82,19 @@ def WriteLines(file, lines, encoding="utf-8"):
 
 
 def GetChromePath() -> str:
-    path = None
+    path = ""
     if sys.platform == "win32":
-        path = u'%s\\Google\\Chrome\\Application\\chrome.exe' % os.environ["PROGRAMFILES(X86)"]
+        path = u'%(PROGRAMFILES)s\\Google\\Chrome\\Application\\chrome.exe' % os.environ
         if not os.path.exists(path):
-            path = u'%s\\Google\\Chrome\\Application\\chrome.exe' % os.environ["PROGRAMFILES"]
-        # if os.path.exists(path):
-        #     path = '"%s"' % path
+            path = u'%s\\Google\\Chrome\\Application\\chrome.exe' % os.environ["PROGRAMFILES(X86)"]
+        if not os.path.exists(path):
+            path = u"%(LOCALAPPDATA)s\\Google\\Chrome\\Application\\chrome.exe" % os.environ
     elif sys.platform == "linux":
-        path = "google-chrome"
+        path = ""
+    elif sys.platform == "darwin":
+        path = ""
+    if not os.path.exists(path):
+        path = ""
     return path
 
 

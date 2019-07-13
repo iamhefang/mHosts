@@ -1,9 +1,11 @@
 import os
 import sys
 
-from wx import EVT_KEY_UP, EVT_KEY_DOWN
-from wx.stc import StyledTextCtrl, STC_MARGIN_NUMBER, STC_STYLE_LINENUMBER, STC_STYLE_DEFAULT, EVT_STC_CHANGE, \
-    STC_P_DEFAULT, STC_P_COMMENTLINE, STC_P_CHARACTER, STC_P_CLASSNAME, STC_LEX_CONF
+from wx import EVT_KEY_DOWN, EVT_KEY_UP
+from wx.stc import (EVT_STC_CHANGE, STC_LEX_CONF, STC_MARGIN_NUMBER,
+                    STC_P_CHARACTER, STC_P_CLASSNAME, STC_P_COMMENTLINE,
+                    STC_P_DEFAULT, STC_STYLE_DEFAULT, STC_STYLE_LINENUMBER,
+                    StyledTextCtrl)
 
 if sys.platform == 'win32':
     style = {
@@ -17,7 +19,7 @@ elif sys.platform == 'darwin':
     }
 else:
     style = {
-        'font': 'Times',
+        'font': 'Consolas',
         'size': 12,
     }
 
@@ -51,14 +53,18 @@ class CodeView(StyledTextCtrl):
     def InitStyle(self):
         self.SetLexer(STC_LEX_CONF)
         # 默认字体
-        self.StyleSetSpec(STC_STYLE_DEFAULT, "face:%(font)s,size:%(size)d,fore:#99ff99" % style)
+        self.StyleSetSpec(STC_STYLE_DEFAULT,"face:%(font)s,size:%(size)d,fore:#99ff99" % style)
         # 域名
-        self.StyleSetSpec(STC_P_DEFAULT, "fore:#7F007F,face:%(font)s,size:%(size)d" % style)
-        self.StyleSetSpec(STC_P_CHARACTER, "fore:#7F007F,face:%(font)s,size:%(size)d" % style)
+        self.StyleSetSpec(
+            STC_P_DEFAULT, "fore:#7F007F,face:%(font)s,size:%(size)d" % style)
+        self.StyleSetSpec(
+            STC_P_CHARACTER, "fore:#7F007F,face:%(font)s,size:%(size)d" % style)
         # 注释
-        self.StyleSetSpec(STC_P_COMMENTLINE, "fore:#999999,face:%(font)s,size:%(size)d" % style)
+        self.StyleSetSpec(STC_P_COMMENTLINE,
+                          "fore:#999999,face:%(font)s,size:%(size)d" % style)
         # ip地址
-        self.StyleSetSpec(STC_P_CLASSNAME, "fore:#0000FF,size:%(size)d" % style)
+        self.StyleSetSpec(
+            STC_P_CLASSNAME, "fore:#0000FF,size:%(size)d" % style)
 
     def OnChange(self, event):
         pass

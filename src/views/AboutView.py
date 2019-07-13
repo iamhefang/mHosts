@@ -34,6 +34,12 @@ class AboutView(HtmlWindow):
         <a href="https://github.com/iamhefang/mHosts">https://github.com/iamhefang/mHosts</a>
     </td>
 </tr>
+<tr>
+    <td style='text-align: right;'>问题和建议:</td>
+    <td>
+        <a href="https://github.com/iamhefang/mHosts/issues">Issues</a>
+    </td>
+</tr>
 </table>
 </body>
 </html>""" % params)

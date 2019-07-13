@@ -8,7 +8,7 @@
             "name": "Python: 启动",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}\\mHosts.py",
+            "program": "${workspaceFolder}/mHosts.py",
             "console": "integratedTerminal"
         }
     ]

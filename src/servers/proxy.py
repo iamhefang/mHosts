@@ -17,7 +17,6 @@ class ProxyServer(Thread):
         self.__addr = addr
 
     def run(self) -> None:
-        # self.run2()
         try:
             data = self.__conn.recv(409600000)
             headers = parseHttpHeader(data)

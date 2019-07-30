@@ -180,6 +180,7 @@ class MainWindow(MainFrame):
             else:
                 MessageBox("保存失败", "提示", ICON_ERROR)
             self.InitHostsTree(ID_SYSTEM_HOSTS)
+            Settings.Save()
         except Exception as e:
             message = str(e)
             if "Permission denied" in message:

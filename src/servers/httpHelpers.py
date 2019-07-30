@@ -15,41 +15,43 @@ def parseHttpHeader(rawBytes: bytes):
     headerLines = rawBytes.split(b"\r\n\r\n")[0].decode("utf-8").split("\r\n")
     headers = {}
     for header in headerLines:
+        if not header:
+            continue
         index = headerLines.index(header)
         if index == 0:
             values = header.split(" ")
             if values[0].startswith("HTTP/"):
-                headers["http-version"] = values[0]
-                headers["code"] = int(values[1])
-                headers["message"] = " ".join(values[2:])
+                headers["Http-version"] = values[0]
+                headers["Code"] = int(values[1])
+                headers["Message"] = " ".join(values[2:])
             else:
-                headers["method"] = values[0]
-                headers["url"] = values[1]
-                headers["http-version"] = values[2]
+                headers["Method"] = values[0]
+                headers["Url"] = values[1]
+                headers["Http-Version"] = values[2]
         else:
             values = header.split(": ")
             key = values[0].lower()
-            if key == "host":
+            if key == "Host":
                 (host, port) = parseAddr(values[1])
-                headers["host"] = host
-                headers["port"] = port
+                headers["Host"] = host
+                headers["Port"] = port
             else:
                 headers[key] = values[1]
-        if "content-length" in headers:
-            headers["content-length"] = int(headers["content-length"])
+        if "Content-Length" in headers:
+            headers["Content-Length"] = int(headers["Content-Length"])
     return headers
 
 
 def parseResponseBody(rawData: bytes) -> bytes:
-    return rawData.split(b"\r\n\r\n")[1]
+    return rawData.split(b"\r\n\r\n")[1] if b"\r\n\r\n" in rawData else None
 
 
 def makeRequestHeader(option: dict) -> bytes:
     headers = "%s %s %s" % (
-        option["method"], option["url"], option["http-version"]
+        option["Method"], option["Url"], option["Http-Version"]
     )
     for key, value in option.items():
-        if key == "method" or key == "url" or key == "http-version":
+        if key == "Method" or key == "Url" or key == "Http-Version":
             continue
         headers += "\r\n%s: %s" % (key, value)
     return (headers + "\r\n\r\n").encode("utf-8")
@@ -57,10 +59,10 @@ def makeRequestHeader(option: dict) -> bytes:
 
 class HttpClient:
     __opt: dict = {
-        "method": 'GET',
-        "http-version": "HTTP/1.1",
-        "connection": "keep-alive",
-        "user-agent": "HttpClientPython/1.0.0"
+        "Method": 'GET',
+        "Http-Version": "HTTP/1.1",
+        "Connection": "keep-alive",
+        "User-Agent": "HttpClientPython/1.0.0"
     }
 
     def __init__(self, option: dict = None):
@@ -69,8 +71,8 @@ class HttpClient:
     def request(self, url: str):
         (scheme, netloc, path, params, query, fragment) = urlparse(url)
         address = parseAddr(netloc)
-        self.__opt["host"] = netloc
-        self.__opt["url"] = url
+        self.__opt["Host"] = netloc
+        self.__opt["Url"] = url
         client = socket(AF_INET, SOCK_STREAM)
         client.connect(address)
         data = makeRequestHeader(self.__opt)
@@ -86,4 +88,4 @@ class HttpClient:
         return resHeaders, resBody
 
 
-print(HttpClient().request("http://qq.com"))
+print(HttpClient().request("http://10.8.241.47:8000/api/v1/Amon/UnitTemplate/"))

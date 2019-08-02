@@ -8,6 +8,7 @@ from wx import App, MessageBox, ICON_ERROR, EVT_CLOSE, LaunchDefaultBrowser, Dis
 from wx.stc import EVT_STC_CHANGE
 
 from src import Hosts
+from src.BackgroundThread import BackgroundThread
 from src.CheckNewVersionThread import CheckNewVersionThread
 from src.helpers import NowToTimestamp, Now, ParseHosts
 from src.settings import Settings, systemHosts, ID_SYSTEM_HOSTS
@@ -260,6 +261,7 @@ class MainWindow(MainFrame):
         MessagePanel.Send(u"刷新DNS成功", u"提示")
 
     def Exit(self):
+        BackgroundThread.stopAllBackThread()
         self.trayIcon.Destroy()
         self.aboutDialog.Close()
         self.aboutDialog.Destroy()

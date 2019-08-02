@@ -19,9 +19,9 @@ class BackgroundThread(Thread):
             self.__callbackRun()
 
     def stop(self):
-        self.__event.set()
         if callable(self.__callbackStop):
             self.__callbackStop()
+        self.__event.set()
 
     @staticmethod
     def stopAllBackThread():

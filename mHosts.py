@@ -1,10 +1,17 @@
 # _*_ coding: utf-8 _*_
 import sys
 
+import wx
+
+from src.servers.main import MainServer
 from src.settings import Settings
 from src.views.MainWindow import MainWindow
 
 if __name__ == '__main__':
+    if not MainServer.start():
+        app = wx.App()
+        wx.MessageBox("程序正在运行中, 请勿重复打开", "正在运行", wx.ICON_ERROR)
+        exit(0)
     Settings.Init()
     if sys.platform == "win32":
         # 开启在Windows系统中高分屏适配

@@ -9,3 +9,8 @@ temp/
 /settings.json
 *.iml
 __pycache__/
+
+node_modules
+package.json
+package-lock.json
+yarn.lock

@@ -36,7 +36,7 @@ function setProxy(port) {
                     scheme: 'http',
                     host: host,
                     port: port
-                }
+                },
             }
         }
     })

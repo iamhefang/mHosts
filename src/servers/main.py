@@ -23,11 +23,11 @@ class MainServer(BaseHTTPRequestHandler):
             return
         matches = re.compile(r"/apis/proxy/(\d+)\.json").match(self.path)
         if matches and matches.group(1):
-            id = int(matches.group(1))
+            hostsId = int(matches.group(1))
             self.wfile.write(json.dumps({
                 "success": True,
                 "result": {
-                    "id": id,
+                    "id": hostsId,
                     "port": 9961
                 }
             }).encode())
@@ -39,7 +39,6 @@ class MainServer(BaseHTTPRequestHandler):
     def start():
         try:
             with urlopen("http://127.0.0.1:1994") as res:
-                print(res)
                 return False
         except:
             def start():

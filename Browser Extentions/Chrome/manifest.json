@@ -1,24 +1,24 @@
 {
-  "background": [
-    "mHosts.js"
-  ],
-  "browser_action": {
-    "default_icon": {
-      "38": "logo.ico"
+    "background": [
+        "mHosts.js"
+    ],
+    "browser_action": {
+        "default_icon": {
+            "38": "logo.ico"
+        },
+        "default_popup": "menu.html",
+        "default_title": "mHosts菜单"
     },
-    "default_popup": "menu.html",
-    "default_title": "mHosts菜单"
-  },
-  "manifest_version": 2,
-  "name": "mHosts",
-  "permissions": [
-    "proxy",
-    "storage",
-    "tabs",
-    "<all_urls>",
-    "http://*/*",
-    "https://*/*",
-    "webRequest"
-  ],
-  "version": "0.0.1"
+    "manifest_version": 2,
+    "name": "mHosts",
+    "permissions": [
+        "proxy",
+        "storage",
+        "tabs",
+        "<all_urls>",
+        "http://*/*",
+        "https://*/*",
+        "webRequest"
+    ],
+    "version": "0.0.1"
 }

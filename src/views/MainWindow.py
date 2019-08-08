@@ -45,7 +45,7 @@ class MainWindow(MainFrame):
         )
         for hosts in Settings.settings["hosts"]:
             itemId = self.hostsTree.AppendItem(
-                root, hosts["name"], data=hosts, image=self.images[hosts["icon"]]
+                root, hosts["name"], data=hosts, image=self.images[hosts["icon"] if hosts["icon"] else "logo"]
             )
             self.hostsTree.SetItemBold(itemId, hosts["active"])
             if hosts["active"]:

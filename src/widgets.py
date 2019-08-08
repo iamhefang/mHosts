@@ -262,7 +262,7 @@ class EditDialog(Dialog):
             self.localRadio.Enable(True)
             self.localRadio.SetValue(True)
             self.urlInput.SetValue("")
-            self.iconComboBox.SetValue("")
+            self.iconComboBox.SetValue("logo")
             self.nameInput.SetValue("")
 
     def OnButtonClicked(self, event):
@@ -279,6 +279,8 @@ class EditDialog(Dialog):
         elif isOnline and (not url or len(url) < 1):
             MessageBox("请输入在线Hosts地址", "提示", ICON_WARNING)
         else:
+            if not self.iconComboBox.GetValue():
+                self.iconComboBox.SetValue("logo")
             if self.__hosts:
                 self.__hosts["name"] = name
                 self.__hosts["url"] = url

@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 from subprocess import Popen
 
 from wx import App, MessageBox, ICON_ERROR, EVT_CLOSE, LaunchDefaultBrowser, DisplaySize, \
@@ -25,6 +26,7 @@ class MainWindow(MainFrame):
     __currentEditHost = None
 
     def __init__(self):
+        print(os.environ)
         self.app.locale = Locale(LANGUAGE_CHINESE_SIMPLIFIED)
         realSize = DisplaySize()
         self.dpiX = realSize[0] / self.size[0]
@@ -208,7 +210,11 @@ class MainWindow(MainFrame):
             TrayIcon.ID_IMPORT: None,
             TrayIcon.ID_LUNCH_CHROME: lambda: MainWindow.LunchChrome(),
             TrayIcon.ID_LUNCH_CHROME_CROS: lambda: MainWindow.LunchChrome(
-                "--disable-web-security --user-data-dir"
+                "--disable-web-security --user-data-dir=%(temp)s%(sep)smHostsChromeTempDir%(sep)s%(time)d" % {
+                    'temp': os.environ['TEMP'],
+                    'sep': os.sep,
+                    'time': time.time()
+                }
             ),
             TrayIcon.ID_LUNCH_CHROME_NO_PLUGINS: lambda: MainWindow.LunchChrome(
                 "--disable-plugins --disable-extensions"
@@ -219,6 +225,7 @@ class MainWindow(MainFrame):
             ),
             TrayIcon.ID_TREE_MENU_DELETE: lambda: self.DeleteHosts(self.__currentSelectHost)
         }
+
         if event.GetId() in handlers:
             callback = handlers[event.GetId()]
             if callable(callback):
@@ -250,6 +257,7 @@ class MainWindow(MainFrame):
             if ' ' in chromePath:
                 chromePath = '"%s"' % chromePath
             cmd = u'%s %s' % (chromePath, args)
+            print("正在启动Chrome, 命令:", cmd)
             Popen(cmd)
         else:
             Settings.settings["chromePath"] = ""

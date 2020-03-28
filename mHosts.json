@@ -1,7 +1,7 @@
 {
-    "version": "1.0.4",
-  "registry": {
-    "type": "list",
-    "url": "https://github.com/iamhefang/mHosts/releases"
-  }
+    "version": "1.0.5",
+    "registry": {
+        "type": "list",
+        "url": "https://github.com/iamhefang/mHosts/releases"
+    }
 }

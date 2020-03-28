@@ -2,10 +2,12 @@ import os
 import sys
 
 from wx import EVT_KEY_DOWN, EVT_KEY_UP
-from wx.stc import (EVT_STC_CHANGE, STC_LEX_CONF, STC_MARGIN_NUMBER,
-                    STC_P_CHARACTER, STC_P_CLASSNAME, STC_P_COMMENTLINE,
-                    STC_P_DEFAULT, STC_STYLE_DEFAULT, STC_STYLE_LINENUMBER,
-                    StyledTextCtrl)
+from wx.stc import (
+    EVT_STC_CHANGE, STC_LEX_CONF, STC_MARGIN_NUMBER,
+    STC_P_CHARACTER, STC_P_CLASSNAME, STC_P_COMMENTLINE,
+    STC_P_DEFAULT, STC_STYLE_DEFAULT, STC_STYLE_LINENUMBER,
+    StyledTextCtrl
+)
 
 if sys.platform == 'win32':
     style = {
@@ -53,7 +55,7 @@ class CodeView(StyledTextCtrl):
     def InitStyle(self):
         self.SetLexer(STC_LEX_CONF)
         # 默认字体
-        self.StyleSetSpec(STC_STYLE_DEFAULT,"face:%(font)s,size:%(size)d,fore:#99ff99" % style)
+        self.StyleSetSpec(STC_STYLE_DEFAULT, "face:%(font)s,size:%(size)d,fore:#99ff99" % style)
         # 域名
         self.StyleSetSpec(
             STC_P_DEFAULT, "fore:#7F007F,face:%(font)s,size:%(size)d" % style)
